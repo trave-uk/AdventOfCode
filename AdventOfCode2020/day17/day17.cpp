@@ -153,5 +153,3 @@ int main()
 	printf("Part 2: %zd\n", ProcessFile(filename, 2));
 	return 0;
 }
-
-// 11646 too high
