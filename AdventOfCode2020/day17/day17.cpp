@@ -108,6 +108,7 @@ bool ProcessStep(int part)
 
 size_t ProcessFile(const char *filename, int part)
 {
+	map.clear();
 	char* buffer = new char[65536];
 	FILE *fp = fopen(filename, "rt");
 	int y = 0;
