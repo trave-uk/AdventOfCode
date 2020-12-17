@@ -8,7 +8,7 @@ int main()
 	int result = 0;
 	char* buffer = new char[65536];
 	FILE *fp = fopen( "example.txt", "rt" );
-//	FILE *fp = fopen( "input.txt", "rt" );
+	//FILE *fp = fopen( "input.txt", "rt" );
 	while ( !feof( fp ) )
 	{
 		char* thisLine = fgets( buffer, 65536, fp );
@@ -20,6 +20,6 @@ int main()
 	fclose( fp );
 	delete[] buffer;
 
-	printf( "result: %d", result );
+	printf( "result: %d\n", result );
 	return 0;
 }
