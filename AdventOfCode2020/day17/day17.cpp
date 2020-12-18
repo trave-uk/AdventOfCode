@@ -108,6 +108,7 @@ bool ProcessStep(int part)
 
 size_t ProcessFile(const char *filename, int part)
 {
+	map.clear();
 	char* buffer = new char[65536];
 	FILE *fp = fopen(filename, "rt");
 	int y = 0;
@@ -152,5 +153,3 @@ int main()
 	printf("Part 2: %zd\n", ProcessFile(filename, 2));
 	return 0;
 }
-
-// 11646 too high
