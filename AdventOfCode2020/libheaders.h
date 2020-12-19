@@ -27,3 +27,5 @@
 #include <conio.h>
 
 #define _ARRAYSIZE_(x) (sizeof(x)/sizeof(*x))
+
+using int64 = __int64;
