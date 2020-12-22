@@ -49,7 +49,7 @@ int main()
 	// * get separate lists for all sections (include 0 in the first section, but the device is in a section on its own so can be ignored)
 	// * don't bother storing any other sections of length 1 either
 	// * work out per section how many combinations work
-	// * multiply values for each section together, using an __int64 (trillions!).
+	// * multiply values for each section together, using an int64 (trillions!).
 	x = 0;
 	int maxsize = 0;
 	std::vector<std::set<int>> sections;
@@ -74,17 +74,17 @@ int main()
 	{
 		sections.push_back(section);
 	}
-	printf("...%d sections\n", sections.size());
+	printf("...%zd sections\n", sections.size());
 	printf("...longest section %d values\n", maxsize);
 
-	__int64 part2 = 1;
+	int64 part2 = 1;
 	for (std::set<int> section : sections)
 	{
 		// In each section, which combinations of entries in the middle can be removed but still be a valid list?
 		// power of two possibilities: 2^(size-2)
 
 		int possible = 1 << (section.size()-2);
-		__int64 actual = 1;
+		int64 actual = 1;
 		// now check each possibility, skipping 0 which will pass
 		for (int i = 1; i < possible; ++i)
 		{

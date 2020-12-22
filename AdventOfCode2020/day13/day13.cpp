@@ -13,7 +13,7 @@ struct Bus
 std::vector<Bus> buses;
 int highest = -1;
 int highest_index = 0;
-__int64 earliest = 0;
+int64 earliest = 0;
 
 int main()
 {
@@ -71,16 +71,16 @@ int main()
 	}
 	printf( "Part 1: %d\n", result );
 
-	__int64 part2 = 0;
+	int64 part2 = 0;
 	
-	for (__int64 time = (earliest/highest + 1) * highest; part2 == 0; time += highest)
+	for (int64 time = (earliest/highest + 1) * highest; part2 == 0; time += highest)
 	{
-		__int64 st = time - highest_index;
+		int64 st = time - highest_index;
 		int index = 0;
 		bool fail = false;
 		for (const Bus& bus : buses)
 		{
-			__int64 t = st + bus.index;
+			int64 t = st + bus.index;
 			if ((t % bus.num) != 0)
 			{
 				fail = true;

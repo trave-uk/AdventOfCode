@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 
-using Value = __int64;
+using Value = int64;
 
 int process(const char *filename, int preamble)
 {

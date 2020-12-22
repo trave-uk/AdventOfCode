@@ -170,7 +170,7 @@ int main()
 		assert(!stuck);
 	}
 
-	__int64 part2 = 1L;
+	int64 part2 = 1L;
 	for (Rule r : rules)
 	{
 		if (r.name.find("departure") == 0)

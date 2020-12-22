@@ -4,16 +4,16 @@
 #include "stdafx.h"
 
 const int shift = 16;
-const __int64 add = 1 << (shift - 1);
-const __int64 mask = (1 << shift) - 1;
+const int64 add = 1 << (shift - 1);
+const int64 mask = (1 << shift) - 1;
 
-__int64 Index(int x, int y, int z, int w)
+int64 Index(int x, int y, int z, int w)
 {
 	assert(x > -add && x < add && y > -add && y < add && z > -add && z < add && w > -add && w < add);
 	return (x + add) + ((y + add) << shift) + ((z + add) << (shift * 2)) + ((w + add) << (shift * 3));
 }
 
-void Coords(__int64 index, int&x, int&y, int&z, int &w)
+void Coords(int64 index, int&x, int&y, int&z, int &w)
 {
 	x = (index & mask) - add;
 	index = index >> shift;
@@ -24,7 +24,7 @@ void Coords(__int64 index, int&x, int&y, int&z, int &w)
 	w = (index & mask) - add;
 }
 
-using Map = std::set<__int64>;
+using Map = std::set<int64>;
 Map map;
 
 int CountCubes(int x, int y, int z, int w, int part)
@@ -58,7 +58,7 @@ bool ProcessStep(int part)
 {
 	bool changes = false;
 	Map neighbours;
-	for (__int64 active : map)
+	for (int64 active : map)
 	{
 		int x, y, z, w;
 		Coords(active, x, y, z, w);
@@ -78,7 +78,7 @@ bool ProcessStep(int part)
 	}
 
 	Map next;
-	for (__int64 test : neighbours)
+	for (int64 test : neighbours)
 	{
 		int x, y, z, w;
 		Coords(test, x, y, z, w);

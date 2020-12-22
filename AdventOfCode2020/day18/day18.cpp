@@ -18,7 +18,7 @@ enum TYPE
 
 struct StackEntry
 {
-	StackEntry(__int64 value)
+	StackEntry(int64 value)
 	{
 		type = TYPE_VALUE;
 		op = OP::LEFTBRACKET;
@@ -33,10 +33,10 @@ struct StackEntry
 
 	TYPE type;
 	OP op;
-	__int64 val;
+	int64 val;
 };
 
-__int64 evaluate(char* expression, int part)
+int64 evaluate(char* expression, int part)
 {
 	// Use shunting-yard algorithm to generate commands
 	// https://en.wikipedia.org/wiki/Shunting-yard_algorithm
@@ -119,7 +119,7 @@ __int64 evaluate(char* expression, int part)
 	}
 
 	// Now evaluate
-	std::vector<__int64> queue;
+	std::vector<int64> queue;
 	for (StackEntry e : postFixQueue)
 	{
 		if (e.type == TYPE_VALUE)
@@ -129,11 +129,11 @@ __int64 evaluate(char* expression, int part)
 		else
 		{
 			assert(e.type == TYPE_OPERATOR);
-			__int64 second = queue.back();
+			int64 second = queue.back();
 			queue.pop_back();
-			__int64 first = queue.back();
+			int64 first = queue.back();
 			queue.pop_back();
-			__int64 result = 0;
+			int64 result = 0;
 			switch (e.op)
 			{
 			case OP::ADD:
@@ -157,7 +157,7 @@ int main()
 {
 	for (int part = 1; part <= 2; ++part)
 	{
-		__int64 total = 0;
+		int64 total = 0;
 		char* buffer = new char[65536];
 		//FILE *fp = fopen("example.txt", "rt");
 		FILE *fp = fopen( "input.txt", "rt" );
@@ -167,7 +167,7 @@ int main()
 			if (thisLine)
 			{
 				thisLine[strcspn(thisLine, "\n\r")] = '\0';
-				__int64 value = evaluate(thisLine, part);
+				int64 value = evaluate(thisLine, part);
 				total += value;
 				//printf("%s becomes %lld.\n", thisLine, value);
 			}

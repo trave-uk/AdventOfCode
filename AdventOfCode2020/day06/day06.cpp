@@ -23,7 +23,7 @@ int main()
 			thisLine[strcspn( thisLine, "\n\r" )] = '\0';
 			if ( !*thisLine )
 			{
-				printf( "%d + ", andGroup.length() );
+				printf( "%zd + ", andGroup.length() );
 				total1 += orGroup.size();
 				total2 += andGroup.length();
 				orGroup.clear();
@@ -58,7 +58,7 @@ int main()
 			}
 		}
 	}
-	printf( "%d\n", andGroup.length() );
+	printf( "%zd\n", andGroup.length() );
 	total1 += orGroup.size();
 	total2 += andGroup.length();
 	fclose( fp );

@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 
-using Value = __int64;
+using Value = int64;
 
 std::map<Value, Value> memory;
 std::map<Value, Value> memory2;
