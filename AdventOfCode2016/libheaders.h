@@ -29,5 +29,6 @@
 #define _ARRAYSIZE_(x) (sizeof(x)/sizeof(*x))
 
 #include "crc.h"
+#include "md5.h"
 
 using int64 = __int64;
