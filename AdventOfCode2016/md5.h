@@ -341,7 +341,7 @@ public:
 	}
 
 	// Digests a string and prints the result.
-	char* digestString( char *string )
+	char* digestString( const char *string )
 	{
 		Init();
 		Update( (unsigned char*)string, strlen( string ) );
@@ -351,4 +351,41 @@ public:
 	}
 };
 
+#endif
+
+#if 0
+// Alternative WinCrypt version
+#include <Wincrypt.h>
+
+HCRYPTPROV hCryptProv = NULL;
+
+void init_md5()
+{
+	// Get a handle to a cryptography provider context.
+	CryptAcquireContext(&hCryptProv, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT);
+}
+
+
+std::string md5(std::string input)
+{
+	HCRYPTHASH hHash = NULL;
+	BYTE rgbHash[16];
+	DWORD cbHash = 16;
+
+	// Acquire a hash object handle.
+	CryptCreateHash(hCryptProv, CALG_MD5, 0, 0, &hHash);
+	CryptHashData(hHash, (const BYTE *)input.c_str(), input.length(), 0);
+	CryptGetHashParam(hHash, HP_HASHVAL, rgbHash, &cbHash, 0);
+	CryptDestroyHash(hHash);
+
+	std::string output;
+	for (DWORD i = 0; i < cbHash; i++)
+	{
+		char szByte[3];
+		sprintf(szByte, "%02x", rgbHash[i]);
+		output.append(szByte);
+	}
+
+	return output;
+}
 #endif

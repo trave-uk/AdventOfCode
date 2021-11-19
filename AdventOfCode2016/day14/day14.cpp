@@ -3,48 +3,15 @@
 //
 
 #include "stdafx.h"
-#include <Wincrypt.h>
-
-HCRYPTPROV hCryptProv = NULL;
-
-void init_md5()
-{
-	// Get a handle to a cryptography provider context.
-	CryptAcquireContext(&hCryptProv, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT);
-}
-
-
-std::string md5(std::string input)
-{
-	HCRYPTHASH hHash = NULL;
-	BYTE rgbHash[16];
-	DWORD cbHash = 16;
-	CHAR rgbDigits[] = "0123456789abcdef";
-
-	// Acquire a hash object handle.
-	CryptCreateHash(hCryptProv, CALG_MD5, 0, 0, &hHash);
-	CryptHashData(hHash, (const BYTE *)input.c_str(), input.length(), 0);
-	CryptGetHashParam(hHash, HP_HASHVAL, rgbHash, &cbHash, 0);
-	CryptDestroyHash(hHash);
-
-	std::string output;
-	for (DWORD i = 0; i < cbHash; i++)
-	{
-		char szByte[3];
-		sprintf(szByte, "%02x", rgbHash[i]);
-		output.append(szByte);
-	}
-
-	return output;
-}
 
 std::string md5x(std::string input, int extra = 0)
 {
-	std::string result = md5(input);
+	MD5 md5;
+	std::string result = md5.digestString(input.c_str());
 	for (int x = 0; x < extra; ++x)
 	{
 		std::string copy = result;
-		result = md5(copy);
+		result = md5.digestString(copy.c_str());
 	}
 	return result;
 }
@@ -154,8 +121,6 @@ int64 result(std::string salt, bool part2 = false)
 
 int main()
 {
-	init_md5();
-
 	printf("Example 1: %lld\n", result("abc"));
 	printf("Part 1: %lld\n", result("jlmsuwbz"));
 	printf("Example 2: %lld\n", result("abc", true));
