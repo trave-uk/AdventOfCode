@@ -1,4 +1,4 @@
-// day20.cpp : Advent of Code 2021 https://adventofcode.com/2021
+// day15.cpp : Advent of Code 2021 https://adventofcode.com/2021
 // Solution by trave.uk 15/12/2021 https://github.com/trave-uk/AdventOfCode
 //
 
