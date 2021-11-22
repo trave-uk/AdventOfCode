@@ -51,7 +51,7 @@ void Part1(std::string title, std::string passcode)
 			t.y += (i == 1) - (i == 0);
 			t.path.append(1, dir[i]);
 
-			if (t.x < 0 || t.x > 3 || t.y < 0 || t.y >> 3 || !isOpen(h[i]))
+			if (t.x < 0 || t.x > 3 || t.y < 0 || t.y > 3 || !isOpen(h[i]))
 				continue;
 
 			if (t.x == 3 && t.y == 3)
@@ -66,12 +66,78 @@ void Part1(std::string title, std::string passcode)
 	printf("%s Part 1: no solution\n", title.c_str());
 }
 
+struct State2
+{
+	State2(char _x, char _y, const MD5& _md5)
+		: md5(_md5)
+		, l(0)
+		, x(_x)
+		, y(_y)
+	{}
+
+	MD5 md5;
+	int l;
+	char x;
+	char y;
+};
+
+
+void Part2(std::string title, std::string passcode)
+{
+	MD5 md5;
+
+	md5.Init();
+	md5.Update((const unsigned char*)passcode.c_str(), passcode.length());
+	std::stack<State2> q;
+	q.push(State2(0, 0, md5));
+
+	int longest = 0;
+
+	while (!q.empty())
+	{
+		State2 s = q.top();
+		q.pop();
+
+		char h[5];
+		md5 = s.md5;
+		md5.Final(h, 4);
+
+		for (int i = 0; i < 4; ++i)
+		{
+			if (!isOpen(h[i]))
+				continue;
+			State2 t = s;
+			t.x += (i == 3) - (i == 2);
+			t.y += (i == 1) - (i == 0);
+			if (t.x < 0 || t.x > 3 || t.y < 0 || t.y > 3)
+				continue;
+
+			t.l++;
+			if (t.x == 3 && t.y == 3)
+			{
+				if (t.l > longest)
+					longest = t.l;
+				continue;
+			}
+
+			t.md5.Update((const unsigned char*)(dir + i), 1);
+			q.push(t);
+		}
+	}
+	printf("%s Part 2: %s -> %d\n", title.c_str(), passcode.c_str(), longest);
+}
+
 int main()
 {
 	Part1("Example 1", "ihgpwlah");
 	Part1("Example 2", "kglvqrro");
 	Part1("Example 3", "ulqzkmiv");
 	Part1("My", "edjrjqaa");
+
+	Part2("Example 1", "ihgpwlah");
+	Part2("Example 2", "kglvqrro");
+	Part2("Example 3", "ulqzkmiv");
+	Part2("My", "edjrjqaa");
 
 	return 0;
 }
