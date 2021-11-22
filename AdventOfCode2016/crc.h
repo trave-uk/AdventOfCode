@@ -132,9 +132,9 @@ inline UNS_32_BITS updateCRC32(unsigned char ch, UNS_32_BITS crc)
 
 inline Boolean_T crc32file(char *name, UNS_32_BITS *crc, long *charcnt)
 {
-	register FILE *fin;
-	register UNS_32_BITS oldcrc32;
-	register int c;
+	FILE *fin;
+	UNS_32_BITS oldcrc32;
+	int c;
 
 	oldcrc32 = 0xFFFFFFFF; *charcnt = 0;
 #ifdef MSDOS
@@ -166,7 +166,7 @@ inline Boolean_T crc32file(char *name, UNS_32_BITS *crc, long *charcnt)
 
 inline UNS_32_BITS crc32buf(const char *buf, size_t len)
 {
-	register UNS_32_BITS oldcrc32;
+	UNS_32_BITS oldcrc32;
 
 	oldcrc32 = 0xFFFFFFFF;
 
