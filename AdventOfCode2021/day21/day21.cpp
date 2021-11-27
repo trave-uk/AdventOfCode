@@ -4,27 +4,33 @@
 
 #include "stdafx.h"
 
-int main()
+void Process(const char* filename)
 {
 	int result = 0;
 	char* buffer = new char[65536];
-	FILE *fp = fopen( "example.txt", "rt" );
-	//FILE *fp = fopen( "input.txt", "rt" );
-	while ( !feof( fp ) )
+	FILE *fp = fopen(filename, "rt");
+	while (!feof(fp))
 	{
-		char* thisLine = fgets( buffer, 65536, fp );
-		if ( thisLine )
+		char* thisLine = fgets(buffer, 65536, fp);
+		if (thisLine)
 		{
-			thisLine[strcspn( thisLine, "\n\r" )] = '\0';
-			if ( *thisLine )
+			thisLine[strcspn(thisLine, "\n\r")] = '\0';
+			if (*thisLine)
 			{
 
 			}
 		}
 	}
-	fclose( fp );
+	fclose(fp);
 	delete[] buffer;
 
-	printf( "Part 1: %d\n", result );
+	printf("%s: Part 1: %d\n", filename, result);
+}
+
+int main()
+{
+	Process("example.txt");
+	Process("input.txt");
+
 	return 0;
 }
