@@ -6,7 +6,11 @@
 
 void Process(const char* filename)
 {
-	int result = 0;
+	int forward = 0;
+	int depth1 = 0;
+
+	int depth2 = 0;
+	int aim2 = 0;
 	char* buffer = new char[65536];
 	FILE *fp = fopen(filename, "rt");
 	while (!feof(fp))
@@ -17,14 +21,37 @@ void Process(const char* filename)
 			thisLine[strcspn(thisLine, "\n\r")] = '\0';
 			if (*thisLine)
 			{
-
+				char direction[10];
+				int distance;
+				int matched = sscanf(thisLine, "%s %d", direction, &distance);
+				assert(matched == 2);
+				if (strcmp(direction, "forward") == 0)
+				{
+					forward += distance;
+					depth2 += aim2 * distance;
+				}
+				else if (strcmp(direction, "down") == 0)
+				{
+					depth1 += distance;
+					aim2 += distance;
+				}
+				else if (strcmp(direction, "up") == 0)
+				{
+					depth1 -= distance;
+					aim2 -= distance;
+				}
+				else
+				{
+					assert(false);
+				}
 			}
 		}
 	}
 	fclose(fp);
 	delete[] buffer;
 
-	printf("%s: Part 1: %d\n", filename, result);
+	printf("%s: Part 1: %d * %d = %d\n", filename, forward, depth1, forward * depth1);
+	printf("%s: Part 2: %d * %d = %d\n", filename, forward, depth2, forward * depth2);
 }
 
 int main()
