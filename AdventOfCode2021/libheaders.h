@@ -30,5 +30,6 @@
 
 #include "crc.h"
 #include "md5.h"
+#include "astar.h"
 
 using int64 = __int64;
