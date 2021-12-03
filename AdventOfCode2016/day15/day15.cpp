@@ -56,6 +56,7 @@ bool checkStart(int start, const std::vector<Disc> &discs)
 			return false;
 		}
 	}
+	return true;
 }
 
 int main()
