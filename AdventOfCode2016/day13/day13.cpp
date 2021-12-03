@@ -4,9 +4,6 @@
 
 #include "stdafx.h"
 
-
-using coord = std::pair<int64, int64>;
-
 using maze = std::map<coord, int64>;
 
 using test = std::pair<coord, int64>;
@@ -58,11 +55,11 @@ void process(bool bPart2)
 		coord pos2;
 		if (i < 2)
 		{
-			pos2 = std::make_pair(pos.first, pos.second + i * 2 - 1);
+			pos2 = coord(pos.first, pos.second + i * 2 - 1);
 		}
 		else
 		{
-			pos2 = std::make_pair(pos.first + (i - 2) * 2 - 1, pos.second);
+			pos2 = coord(pos.first + (i - 2) * 2 - 1, pos.second);
 		}
 		if (IsWall(pos2))
 			continue;
@@ -105,14 +102,14 @@ int64 flood(coord pos, int64 distance, bool bPart2 = false)
 int main()
 {
 	input = 10;
-	coord pos = std::make_pair(1, 1);
-	target = std::make_pair(7, 4);
+	coord pos(1, 1);
+	target = coord(7, 4);
 	int64 distance = flood(pos, 0);
 	printf("Example: %lld\n", distance);
 
 	input = 1362;
-	pos = std::make_pair(1, 1);
-	target = std::make_pair(31, 39);
+	pos = coord(1, 1);
+	target = coord(31, 39);
 	distance = flood(pos, 0);
 	printf("Part 1: %lld\n", distance);
 
