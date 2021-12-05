@@ -72,6 +72,25 @@ public:
 	{
 		return (abs(start.first - goal.first) + abs(start.second - goal.second));
 	}
+	void operator+=(const coord& rhs)
+	{
+		first += rhs.first;
+		second += rhs.second;
+	}
+	void operator-=(const coord& rhs)
+	{
+		first -= rhs.first;
+		second -= rhs.second;
+	}
+	void operator/=(int64 rhs)
+	{
+		first /= rhs;
+		second /= rhs;
+	}
+	int64 length()
+	{
+		return max(abs(first), abs(second));
+	}
 };
 
 // class tNode must have an "isBlocked" function thus:
