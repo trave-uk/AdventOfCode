@@ -43,7 +43,7 @@ public:
 	}
 
 	std::map<std::string, int64> registers;
-	int64 pc = 0;
+	size_t pc = 0;
 	bool finished = false;
 
 	int64 value(const char* val)
@@ -76,7 +76,6 @@ public:
 			char* r = strtok(nullptr, " ");
 			std::string reg(r);
 			char* val = strtok(nullptr, " ");
-			//			char reg = line[4];
 			if (registers.count(reg) == 0)
 			{
 				registers.insert(std::make_pair(reg, 0));
@@ -110,7 +109,7 @@ public:
 				break;
 			case CASE("tgl"): // e.g. "tgl a"
 			{
-				int64 tgl = pc + registers[reg];
+				size_t tgl = pc + registers[reg];
 				if (tgl >= 0 && tgl < assembly.size())
 				{
 					std::string &tglLine = assembly[tgl];
