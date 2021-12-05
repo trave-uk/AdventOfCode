@@ -57,6 +57,7 @@ function A_Star(start, goal, h)
 
 #include <map>
 #include <queue>
+#include <conio.h>
 using int64 = long long;
 
 class coord : public std::pair<int64, int64>
@@ -74,10 +75,63 @@ public:
 	}
 };
 
+//#define ASTARDEBUG
+
+#ifdef ASTARDEBUG
+
+static void gotoxy(short x, short y)
+{
+	static HANDLE h = NULL;
+	if (!h)
+		h = GetStdHandle(STD_OUTPUT_HANDLE);
+	COORD c = { x, y };
+	SetConsoleCursorPosition(h, c);
+}
+
+template<class tNode> void print(coord& start, coord& goal, std::map<coord, tNode>& space, coord& max, std::set<coord>& openSet)
+{
+	// TODO: print the entire available space, highlighting the start, goal and contents of openSet.
+	coord pos;
+	gotoxy(0,0);
+	printf("From (%lld,%lld) to (%lld,%lld)              \n", start.first, start.second, goal.first, goal.second);
+	for (pos.second = 0; pos.second <= max.second; ++pos.second)
+	{
+		for (pos.first = 0; pos.first <= max.first; ++pos.first)
+		{
+			if (pos == start)
+				_putch('o');
+			else if (pos == goal)
+				_putch('*');
+			else if (openSet.find(pos) != openSet.end())
+				_putch('O');
+			else if (!space.count(pos))
+				_putch(' ');
+			else if (space[pos].isBlocked())
+				_putch('#');
+			else
+				_putch('.');
+		}
+		_putch('\n');
+	}
+	_putch('\n');
+}
+#endif
+
 // class tNode must have an "isBlocked" function thus:
 //  bool tNode::isBlocked();
 template<class tNode> int64 aStarSearch(coord& start, coord& goal, std::map<coord, tNode>& space, std::vector<coord>* pPath = nullptr)
 {
+#ifdef ASTARDEBUG
+	// Find the maximum extents of space
+	coord max;
+	for (auto node : space)
+	{
+		if (node.first.first > max.first)
+			max.first = node.first.first;
+		if (node.first.second > max.second)
+			max.second = node.first.second;
+	}
+#endif
 	std::set<coord> openSet;
 	openSet.insert(start);
 	std::map<coord, int64> gScore;
@@ -90,6 +144,9 @@ template<class tNode> int64 aStarSearch(coord& start, coord& goal, std::map<coor
 
 	while (!openSet.empty())
 	{
+#ifdef ASTARDEBUG
+		print(start, goal, space, max, openSet);
+#endif
 		int64 minF = INT_MAX;
 		coord current;
 		for (const coord& c : openSet)
