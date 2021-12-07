@@ -6,7 +6,10 @@
 
 void Process(const char* filename)
 {
+	std::vector<int64> numbers;
 	int result = 0;
+	int64 low = INT64_MAX;
+	int64 high = 0;
 	char* buffer = new char[65536];
 	FILE *fp = fopen(filename, "rt");
 	while (!feof(fp))
@@ -17,14 +20,58 @@ void Process(const char* filename)
 			thisLine[strcspn(thisLine, "\n\r")] = '\0';
 			if (*thisLine)
 			{
-
+				char* num = strtok(thisLine, ",");
+				while (num)
+				{
+					int64 n = atoi(num);
+					numbers.push_back(n);
+					if (n < low)
+						low = n;
+					if (n > high)
+						high = n;
+					num = strtok(nullptr, ",");
+				}
 			}
 		}
 	}
 	fclose(fp);
 	delete[] buffer;
 
-	printf("%s: Part 1: %d\n", filename, result);
+	int64 lowestTotal = INT64_MAX;
+	for (int64 n = low; n <= high; ++n)
+	{
+		int64 total = 0;
+		for (int64 m : numbers)
+		{
+			total += abs(n - m);
+		}
+		if (total < lowestTotal)
+		{
+			lowestTotal = total;
+		}
+	}
+	printf("%s: Part 1: %lld\n", filename, lowestTotal);
+
+	lowestTotal = INT64_MAX;
+	for (int64 n = low; n <= high; ++n)
+	{
+		int64 total = 0;
+		for (int64 m : numbers)
+		{
+			int64 top = abs(n - m);
+			while (top)
+			{
+				total += top;
+				--top;
+			}
+		}
+		if (total < lowestTotal)
+		{
+			lowestTotal = total;
+		}
+	}
+	printf("%s: Part 2: %lld\n", filename, lowestTotal);
+
 }
 
 int main()
