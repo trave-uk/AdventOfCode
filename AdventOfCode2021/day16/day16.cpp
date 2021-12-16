@@ -4,23 +4,6 @@
 
 #include "stdafx.h"
 
-struct Literal
-{
-	int64 value;
-};
-
-struct Operator
-{
-	int packet_count;
-};
-
-struct Packet
-{
-	int version; // 3 bits
-	int type; // 3 bits
-
-};
-
 int64 Value(std::string binary)
 {
 	assert(binary.length() < 64);
@@ -39,19 +22,16 @@ int64 Value(std::string binary)
 int64 DecodePacket(std::string& binary, int& pos, int64& versionSum)
 {
 	int64 value = 0;
-	Packet p;
-	std::string version = binary.substr(pos, 3);
-	p.version = Value(version);
-	versionSum += p.version;
+	std::string versionString = binary.substr(pos, 3);
+	int64 version = Value(versionString);
+	versionSum += version;
 	pos += 3;
 
-	std::string type = binary.substr(pos, 3);
-	p.type = Value(type);
+	std::string typeString = binary.substr(pos, 3);
+	int64 type = Value(typeString);
 	pos += 3;
 
-	switch (p.type)
-	{
-	case 4:
+	if (type == 4) // literal value
 	{
 		bool bKeepGoing;
 		std::string literalValue;
@@ -62,39 +42,36 @@ int64 DecodePacket(std::string& binary, int& pos, int64& versionSum)
 			pos += 4;
 		} while (bKeepGoing);
 		value = Value(literalValue);
-		break;
 	}
-	default:
+	else // operators
 	{
 		std::vector<int64> values;
-		switch (binary[pos++])
-		{
-		case '0':
+		char mode = binary[pos++];
+		if (mode == '0')
 		{
 			std::string lengthString = binary.substr(pos, 15);
 			pos += 15;
-			int length = Value(lengthString);
+			int64 length = Value(lengthString);
 			int start = pos;
 			while (pos < start + length)
 			{
 				values.push_back(DecodePacket(binary, pos, versionSum));
 			}
 			assert(pos == start + length);
-			break;
 		}
-		case '1':
+		else
 		{
+			assert(mode == '1');
 			std::string countString = binary.substr(pos, 11);
 			pos += 11;
-			int count = Value(countString);
+			int64 count = Value(countString);
 			while (count)
 			{
 				values.push_back(DecodePacket(binary, pos, versionSum));
 				--count;
 			}
 		}
-		}
-		switch (p.type)
+		switch (type)
 		{
 		case 0: // sum
 			value = 0;
@@ -139,8 +116,6 @@ int64 DecodePacket(std::string& binary, int& pos, int64& versionSum)
 		default:
 			assert(false);
 		}
-		break;
-	}
 	}
 	return value;
 }
@@ -189,7 +164,6 @@ void Process(const char* filename, bool bPart1 = true, bool bPart2 = true)
 	}
 	fclose(fp);
 	delete[] buffer;
-
 }
 
 int main()
