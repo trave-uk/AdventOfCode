@@ -161,7 +161,21 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="example.txt" />
+    <Text Include="example1.txt" />
+    <Text Include="example2.txt" />
+    <Text Include="example21.txt" />
+    <Text Include="example22.txt" />
+    <Text Include="example23.txt" />
+    <Text Include="example24.txt" />
+    <Text Include="example25.txt" />
+    <Text Include="example26.txt" />
+    <Text Include="example27.txt" />
+    <Text Include="example28.txt" />
+    <Text Include="example3.txt" />
+    <Text Include="example4.txt" />
+    <Text Include="exampleA.txt" />
+    <Text Include="exampleB.txt" />
+    <Text Include="exampleC.txt" />
     <Text Include="input.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
