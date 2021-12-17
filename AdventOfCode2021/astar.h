@@ -57,7 +57,7 @@ function A_Star(start, goal, h)
 
 #include <map>
 #include <queue>
-using int64 = long long;
+using int64 = __int64;
 
 class coord : public std::pair<int64, int64>
 {
@@ -90,6 +90,10 @@ public:
 	int64 length()
 	{
 		return max(abs(first), abs(second));
+	}
+	bool isContained(const coord& min, const coord& max)
+	{
+		return first >= min.first && first <= max.first && second >= min.second && second <= max.second;
 	}
 };
 
