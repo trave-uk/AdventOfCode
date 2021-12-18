@@ -59,6 +59,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{26A406
 		crc.h = crc.h
 		libheaders.h = libheaders.h
 		md5.h = md5.h
+		term.h = term.h
 	EndProjectSection
 EndProject
 Global

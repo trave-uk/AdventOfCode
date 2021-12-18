@@ -57,6 +57,10 @@ function A_Star(start, goal, h)
 
 #include <map>
 #include <queue>
+
+#ifndef _ASTAR_H
+#define _ASTAR_H
+
 using int64 = __int64;
 
 class coord : public std::pair<int64, int64>
@@ -231,3 +235,5 @@ template<class tNode> int64 aStarSearch(coord& start, coord& goal, std::map<coor
 	}
 	return -1; // failed to find a path
 }
+
+#endif // _ASTAR_H

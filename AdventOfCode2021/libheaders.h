@@ -23,14 +23,13 @@
 #include <windows.h>
 #include <processenv.h>
 #include <winnt.h>
-#include <wincon.h>
-#include <conio.h>
 
 #define _ARRAYSIZE_(x) (sizeof(x)/sizeof(*x))
 
 #include "crc.h"
 #include "md5.h"
 #include "astar.h"
+#include "term.h"
 
 using int64 = __int64;
 
