@@ -118,9 +118,9 @@ void Process(const char* filename)
 	{
 		Step();
 		if (i == 1)
-			printf("%s: Part 1: %lld\n", filename, map.size()); // not 5964, not 5426??
+			printf("%s: Part 1: %lld\n", filename, map.size());
 	}
-	printf("%s: Part 2: %lld\n", filename, map.size()); // not 5964, not 5426??
+	printf("%s: Part 2: %lld\n", filename, map.size());
 }
 
 int main()
