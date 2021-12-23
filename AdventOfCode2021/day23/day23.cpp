@@ -4,13 +4,25 @@
 
 #include "stdafx.h"
 
+// Oh part 2. My solution below is tailored a bit too closely to work for part 1, but can be tweaked to have bigger rooms...
+
+// Part 1:
 // #############
 // #01 2 3 4 56#
 // ###e#f#g#h###
 //   #a#b#c#d#
 //   #########
 
-// 2 amphipods of each type, with different movement costs
+// Part 2:
+// #############
+// #01 2 3 4 56#
+// ###m#n#o#p###
+//   #i#j#k#l#
+//   #e#f#g#h#
+//   #a#b#c#d#
+//   #########
+
+// 2/4 amphipods of each type, with different movement costs
 //  A = 1 point, target ae
 //  B = 10 points, target bf
 //  C = 100 points, target cg
@@ -20,7 +32,7 @@
 
 // State:
 //  Store the contents of each tile, rooms then corridor, as a string
-//  Using the positions "eafbgchd0123456"
+//  Using the positions "eafbgchd0123456", or 
 //  So the solution is: "AABBCCDD......."
 
 // Valid moves:
@@ -28,18 +40,16 @@
 //  corridor to _correct_ room
 //  not passing through another amphipod
 
-std::string key = "eafbgchd0123456";
+bool bPart2 = false;
+std::string key1 = "eafbgchd0123456";
+std::string key2 = "mieanjfbokgcplhd0123456";
+std::string key = key1;
 
 struct validMove
 {
-	validMove(std::string _path = "", int _cost = 0, char _amphipod = 0)
-		: path(_path)
-		, cost(_cost)
-		, amphipod(_amphipod)
-	{}
-	std::string path;
-	int64 cost;
-	char amphipod;
+	std::string path = "";
+	int64 cost = 0;
+	char amphipod = 0;
 
 	bool operator<(const validMove& rhs) const
 	{
@@ -50,23 +60,41 @@ struct validMove
 std::map<char, std::set<validMove>> validMoves;
 std::map<char, coord> posMap;
 
+char roomToAmphipod(char room)
+{
+	int i = room - 'a';
+	i %= 4;
+	return toupper(i + 'a');
+}
+
 void PopulateValidMoves()
 {
 	// valid moves are from digits to letters and vice versa
 	// the path includes all digits + letters passed through (which must be clear), e.g. "01ea" from 0 to a, which would have cost 4 (the Manhattan distance between 0 and a).
-	// 
-	char map[3][12] =
+	validMoves.clear();
+
+	char map[5][12] =
 	{
 		"01 2 3 4 56",
+		"  m n o p  ",
+		"  i j k l  ",
 		"  e f g h  ",
 		"  a b c d  ",
 	};
-	coord pos;
-	for (pos.second = 0; pos.second < 3; ++pos.second)
+	for (int64 y = 0; y < 5; ++y)
 	{
+		coord pos;
+		pos.second = y;
+		if (!bPart2)
+		{
+			if (y == 1 || y == 2)
+				continue;
+			else if (y > 2)
+				pos.second -= 2;
+		}
 		for (pos.first = 0; pos.first < 11; ++pos.first)
 		{
-			char tile = map[pos.second][pos.first];
+			char tile = map[y][pos.first];
 			if (isalnum(tile))
 			{
 				posMap[tile] = pos;
@@ -77,35 +105,45 @@ void PopulateValidMoves()
 	for (char corridor = '0'; corridor <= '6'; ++corridor)
 	{
 		coord cpos = posMap[corridor];
-		for (char room = 'a'; room <= 'h'; ++room)
+		for (char room = 'a'; room <= (bPart2 ? 'p' : 'h'); ++room)
 		{
 			coord rpos = posMap[room];
 			validMove v;
 			coord distance = rpos;
 			distance -= cpos;
 			v.cost = abs(distance.first) + abs(distance.second);
-			pos = cpos;
+			coord pos = cpos;
+			if (!bPart2 && rpos.second > 0)
+			{
+				rpos.second += 2;
+			}
 			for (; pos.first != rpos.first; pos.first += sgn(rpos.first - cpos.first))
 			{
 				char tile = map[pos.second][pos.first];
-				if (tile != ' ')
+				if (isdigit(tile))
 				{
 					v.path.append(1, tile);
 				}
 			}
-			if (rpos.second == 2)
+			++pos.second;
+			for (; pos.second <= rpos.second; ++pos.second)
 			{
-				char tile = map[1][rpos.first];
-				v.path.append(1, tile);
+				if (!bPart2 && pos.second < 3)
+					pos.second += 2;
+				char tile = map[pos.second][rpos.first];
+				if (isalpha(tile))
+				{
+					v.path.append(1, tile);
+				}
 			}
-			v.path.append(1, room);
-			v.amphipod = toupper(room <= 'd' ? room : room - 4);
+			v.amphipod = roomToAmphipod(room);
 			validMoves[v.amphipod].insert(v);
 			std::reverse(v.path.begin(), v.path.end());
 			v.amphipod = 0;
 			validMoves[v.amphipod].insert(v);
 		}
 	}
+	key = bPart2 ? key2 : key1;
 }
 
 struct StateMap
@@ -152,10 +190,10 @@ struct StateMap
 		{
 			// Also check that amphipod moves don't go next to a different amphipod in the room, and go as deep into the room as possible
 			char roomKey = v.path.back();
-			if (roomKey >= 'e')
+			while (roomKey >= 'e')
 			{
-				char otherRoomKey = roomKey - 4;
-				char otherAmphipod = posToAmphipod[otherRoomKey];
+				roomKey -= 4;
+				char otherAmphipod = posToAmphipod[roomKey];
 				if (otherAmphipod != amphipod)
 				{
 					return false;
@@ -167,16 +205,19 @@ struct StateMap
 			// Don't let amphipods that are in their final position move out unless there is a different amphipod below them.
 			char roomKey = v.path.front();
 			if (roomKey == tolower(amphipod))
-				return false;
-			if (roomKey >= 'e')
 			{
-				char otherRoomKey = roomKey - 4;
-				char otherAmphipod = posToAmphipod[otherRoomKey];
-				if (otherAmphipod == amphipod)
+				return false;
+			}
+			while (roomKey >= 'e')
+			{
+				roomKey -= 4;
+				char otherAmphipod = posToAmphipod[roomKey];
+				if (otherAmphipod != amphipod)
 				{
-					return false;
+					return true;
 				}
 			}
+			return false;
 
 		}
 		return true;
@@ -184,7 +225,6 @@ struct StateMap
 
 	void ApplyPath(std::string path, std::string& state)
 	{
-		assert(IsPathValid(path));
 		int startIndex = key.find(path[0]);
 		int endIndex = key.find(path.back());
 		assert(state[endIndex] == '.');
@@ -208,7 +248,7 @@ int64 heuristic(std::string& start, std::string& goal)
 	for (char amphipod = 'A'; amphipod <= 'D'; ++amphipod)
 	{
 		coord target = goalMap.GetAmphipodPos(amphipod, 1);
-		for (int i = 0; i < 2; ++i)
+		for (int i = 0; i < (bPart2 ? 4 : 2); ++i)
 		{
 			coord a = startMap.GetAmphipodPos(amphipod, i);
 			if (a == target || a == goalMap.GetAmphipodPos(amphipod, 0))
@@ -245,6 +285,7 @@ int64 aStarAmphipod(std::string& start, std::string& goal, std::vector<std::pair
 			}
 		}
 
+		printf("%s\n", current.c_str());
 		if (current == goal)
 		{
 			if (pPath)
@@ -271,7 +312,7 @@ int64 aStarAmphipod(std::string& start, std::string& goal, std::vector<std::pair
 			std::set<validMove> amphipodValid = validMoves[amphipod];
 			std::set<validMove> valid = alwaysValid;
 			valid.insert(amphipodValid.begin(), amphipodValid.end());
-			for (int index = 0; index < 2; ++index)
+			for (int index = 0; index < (bPart2 ? 4 : 2); ++index)
 			{
 				char key = currentState.GetAmphipodKey(amphipod, index);
 				for (validMove v : valid)
@@ -315,28 +356,43 @@ void Print(std::string state)
 	printf("  #%c#%c#%c#%c#  \n", state[1], state[3], state[5], state[7]);
 	printf("  #########  \n");
 }
+//	std::vector<std::pair<std::string, int64>> path;
+//	for (auto state : path)
+//	{
+//		Print(state.first);
+//		printf("Energy used: %lld\n\n", state.second);
+//	}
 
-void Process(const char* name, std::string startState, int64 expectedPart1 = -1)
+void Process(const char* name, std::string startState, int64 expectedPart1 = -1, int64 expectedPart2 = -1)
 {
+	bPart2 = false;
 	PopulateValidMoves();
-	std::string goal = "AABBCCDD.......";
+	std::string goal = bPart2 ? "AAAABBBBCCCCDDDD......." : "AABBCCDD.......";
 
-	std::vector<std::pair<std::string, int64>> path;
-	int64 part1 = aStarAmphipod(startState, goal, &path);
-//	assert(expectedPart1 == -1 || expectedPart1 == part1);
+	int64 part1 = aStarAmphipod(startState, goal);
+	assert(expectedPart1 == -1 || expectedPart1 == part1);
 	if (expectedPart1 != -1 && expectedPart1 != part1)
 		printf("WRONG! ");
 	printf("%s: Part 1: %lld\n", name, part1);
-	for (auto state : path)
-	{
-		Print(state.first);
-		printf("Energy used: %lld\n\n", state.second);
-	}
+
+
+	bPart2 = true;
+	PopulateValidMoves();
+	goal = "AAAABBBBCCCCDDDD.......";
+
+	std::string part2StartState = startState.substr(0, 1) + "DD" + startState.substr(1, 2) + "CB" + startState.substr(3, 2) + "BA" + startState.substr(5, 2) + "AC" + startState.substr(7);
+
+	int64 part2 = aStarAmphipod(part2StartState, goal);
+	assert(expectedPart2 == -1 || expectedPart2 == part2);
+	if (expectedPart2 != -1 && expectedPart2 != part2)
+		printf("WRONG! ");
+	printf("%s: Part 2: %lld\n", name, part2);
+
 }
 
 int main()
 {
-	Process("example", "BACDBCDA.......", 12521);
+	Process("example", "BACDBCDA.......", 12521, 44169);
 	Process("input", "BDACABDC.......");
 
 	return 0;
