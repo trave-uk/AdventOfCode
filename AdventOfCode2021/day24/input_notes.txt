@@ -1,0 +1,324 @@
+inp w		w = A(9)
+mul x 0		;
+add x z		;
+mod x 26	x = z % 26 = 0
+div z 1		;
+add x 11	x += 11 = 11
+eql x w		x = (x == w) = 0
+eql x 0		x = (x == 0) = 1
+mul y 0		;
+add y 25	;
+mul y x		y = x*25  = 25
+add y 1		y += 1 = 26
+mul z y		z *= y = 0
+mul y 0		;
+add y w		;
+add y 14	;
+mul y x		y = x * (w+14) = A+14
+add z y		z += y = A+14 (23)
+
+inp w		w = B (4)
+mul x 0		;
+add x z		;
+mod x 26	x = z % 26 = A+14
+div z 1		;
+add x 13	;
+eql x w		;
+eql x 0		x = (x != w) = 1
+mul y 0		;
+add y 25	;
+mul y x		y = 25 * x = 25
+add y 1		y += 1 = 26
+mul z y		z *= y = (A+14)*26
+mul y 0		;
+add y w		;
+add y 8		;
+mul y x		y = x * (w+8) = B+8
+add z y		z += y = (A+14)*26+B+8 = 26*A + B + 8 + 14*26
+
+inp w		w = C (9)
+mul x 0		;
+add x z		;
+mod x 26	x = z % 26 = B + 8
+div z 1		;
+add x 11	x += 11 = B + 19
+eql x w		;
+eql x 0		x = (x != w) = 1
+mul y 0		;
+add y 25	;
+mul y x		;
+add y 1		y = 25 * x + 1 = 26
+mul z y		z *= y = 26*26*A + 26*B + 26*8 + 26*26*14
+mul y 0		;
+add y w		;
+add y 4		;
+mul y x		y = x * (w + 4) = C+4
+add z y		x += y = 26^2*A + 26^1*B + C + 4 + 26*8 + 26^2*14
+
+inp w		w = D (2)
+mul x 0		;
+add x z		;
+mod x 26	x = z % 26 = C+4
+div z 1		;
+add x 10	x += 10 = C+14
+eql x w		x = (x == w) = 0
+eql x 0		x = !x = 1
+mul y 0		;
+add y 25	;
+mul y x		;
+add y 1		y = x * 25 + 1 = 26
+mul z y		z *= y = 26^3*A + 26^2*B + 26^1*C + 26*4 + 26^2*8 + 26^3*14
+mul y 0		;
+add y w		;
+add y 10	;
+mul y x		y = x * (w + 10) = D+10
+add z y		x += y = 26^3*A + 26^2*B + 26^1*C + D + 10 + 26*4 + 26^2*8 + 26^3*14
+
+inp w		w = E (9)
+mul x 0		;
+add x z		;
+mod x 26	x = z % 26 = D+10
+div z 26	z /= 26 = 26^2*A + 26*B + C + 4 + 26*8 + 26^2*14
+add x -3	x -= 3 = D+7
+eql x w		;
+eql x 0		x = (x != w) = (E != (D+7))
+mul y 0		;
+add y 25	;
+mul y x		;
+add y 1		if ( E == D+7 ) y = 1 else y = 26;
+mul z y		z *= y = (E == D+7) ? (26^2*A + 26*B + C + 4 + 26*8 + 26^2*14) : (26^3*A + 26^2*B + 26*C + 26*4 + 26^2*8 + 26^3*14)
+mul y 0		;
+add y w		;
+add y 14	y = w + 14 = E + 14
+mul y x		;
+add z y		z = (E == D+7) ? (26^2*A + 26*B + C + 4 + 26*8 + 26^2*14) : (26^3*A + 26^2*B + 26*C + E + 14 + 26*4 + 26^2*8 + 26^3*14)
+
+inp w		w = F (9)
+mul x 0		;
+add x z		;
+mod x 26	x = z % 26 = (E == D+7) ? (C+4) : (E+14)
+div z 26	z /= 26 = (E == D+7) ? (26*A + B + 8 + 26*14) : (26^2*A + 26*B + C + 4 + 26*8 + 26^2*14)
+add x -4	x -= 4 = (E == D+7) ? C : (E+10)
+eql x w		;
+eql x 0		x = (w != x) = !(E == D+7 && C == F)
+mul y 0		;
+add y 25	;
+mul y x		;
+add y 1		y = (E == D+7 && C == F) ? 1 : 26
+mul z y		z *= y
+mul y 0		;
+add y w		;
+add y 10	y = w + 10 = F + 10
+mul y x		y = (E == D+7 && C == F) ? 0 : F + 10
+add z y		z = (E == D+7) ? ((C == F) ? (26*A + B + 8 + 26*14) : (26^2*A + 26*B + C + 4 + 26*8 + 26^2*14)) : (26^3*A + 26^2*B + 26*C + F + 10 + 26*4 + 26^2*8 + 26^3*14)
+
+inp w		w = G (9)
+mul x 0		;
+add x z		;
+mod x 26	x %= 26 = (E == D+7) ? ((C == F) ? (A + 14) : (B + 8)) : (C + 4)
+div z 1		;
+add x 12	x += 12
+eql x w		;
+eql x 0		x = (x != w) = 1
+mul y 0		;
+add y 25	;
+mul y x		;
+add y 1		y = x * 25 + 1 = 26
+mul z y		z *= 26
+mul y 0
+add y w		
+add y 4
+mul y x
+add z y		z += G + 4 = (E == D+7) ? ((C == F) ? (26^2*A + 26*B + G + 4 + 26*8 + 26^2*14) : (26^3*A + 26^2*B + 26*C + G + 4 + 26*4 + 26^2*8 + 26^3*14)) : (26^4*A + 26^3*B + 26^2*C + 26*F + G + 4 + 26*10 + 26^2*4 + 26^3*8 + 26^4*14)
+
+inp w		w = H (5)
+mul x 0		;
+add x z		;
+mod x 26	x = z % 26 = G + 4
+div z 26	z /= 26 = (E == D+7) ? ((C == F) ? (26*A + B + 8 + 26*14) : (26^2*A + 26*B + C + 4 + 26*8 + 26^2*14)) : (26^3*A + 26^2*B + 26*C + F + 10 + 26*4 + 26^2*8 + 26^3*14)
+add x -8	x -= 8 = G - 4
+eql x w		;
+eql x 0		x = ( H != G-4) = (G != H+4)
+mul y 0
+add y 25
+mul y x
+add y 1		y = (G == H+4) ? 1 : 26
+mul z y		z *= y
+mul y 0
+add y w
+add y 14
+mul y x		y = (G == H+4) ? 0 : (H + 14)
+add z y		z += y = (E == D+7) ? ((C == F) ? ((G == H+4) ? (26*A + B + 8 + 26*14) : (26^2*A + 26*B + H + 14 + 26*8 + 26^2*14)) : (26^3*A + 26^2*B + 26*C + H + 14 + 26*4 + 26^2*8 + 26^3*14)) : (26^4*A + 26^3*B + 26^2*C + 26*F + H + 14 + 26*10 + 26^2*4 + 26^3*8 + 26^4*14)
+
+inp w		w = I (9)
+mul x 0		;
+add x z		;
+mod x 26	x = z % 26 = (E == D+7 && C == F && G == H+4) ? (B + 8) : (H + 14)
+div z 26	z /= 26 = (E == D+7) ? ((C == F) ? ((G == H+4) ? (A + 14) : (26*A + B + 8 + 26*14)) : (26^2*A + 26*B + C + 4 + 26*8 + 26^2*14)) : (26^3*A + 26^2*B + 26^1*C + F + 10 + 26*4 + 26^2*8 + 26^3*14)
+add x -3	x -= 3 = (E == D+7 && C == F && G == H+4) ? (B + 5) : (H + 11)
+eql x w		;
+eql x 0		x = (x != w) = (E == D+7 && C == F && G == H+4 && I = B+5) ? 0 : 1
+mul y 0		;
+add y 25	;
+mul y x		;
+add y 1		y = (E == D+7 && C == F && G == H+4 && I == B+5) ? 1 : 26
+mul z y		z *= y
+mul y 0		;
+add y w		;
+add y 1		;
+mul y x		y = (E == D+7 && C == F && G == H+4 && I = B+5) ? 0 : (I + 1)
+add z y		z += y = (E == D+7) ? ((C == F) ? ((G == H+4) ? ((I = B+5) ? (A + 14) : (26*A + I + 1 + 26*14)) : (26^2*A + 26*B + I + 1 + 26*8 + 26^2*14)) : (26^3*A + 26^2*B + 26*C + I + 1 + 26*4 + 26^2*8 + 26^3*14)) : (26^4*A + 26^3*B + 26^2*C + 26*F + I + 1 + 26*10 + 26^2*4 + 26^3*8 + 26^4*14)
+
+inp w		w = J (1)
+mul x 0		;
+add x z		;
+mod x 26	x = z % 26 = (E == D+7 && C == F && G == H+4 && I = B+5) ? (A + 4) : (I + 1)
+div z 26	z /= 26 = (E == D+7) ? ((C == F) ? ((G == H+4) ? ((I = B+5) ? 0 : (A + 14)) : (26*A + B + 8 + 26*14)) : (26^2*A + 26*B + C + 4 + 26*8 + 26^2*14)) : (26^3*A + 26^2*B + 26*C + F + 10 + 26*4 + 26^2*8 + 26^3*14)
+add x -12	z -= 12 = (E == D+7 && C == F && G == H+4 && I = B+5) ? (A + 2) : (I - 11)
+eql x w		;
+eql x 0		x = (x != w) = (E == D+7 && C == F && G == H+4 && I = B+5) ? (J != A+2) : 1;
+mul y 0		;
+add y 25	;
+mul y x		;
+add y 1		y = (E == D+7 && C == F && G == H+4 && I == B+5 && J == A+2) ? 1 : 26
+mul z y		z *= y
+mul y 0		;
+add y w		;
+add y 6		;
+mul y x		y = (E == D+7 && C == F && G == H+4 && I == B+5 && J == A+2) ? 0 : (J+6)
+add z y		z += y = (E == D+7) ? ((C == F) ? ((G == H+4) ? ((I = B+5) ? ((J == A+2) ? 0 : J + 6) : (26*A + J + 6 + 26*14)) : (26^2*A + 26*B + J + 6 + 26*8 + 26^2*14)) : (26^3*A + 26^2*B + 26*C + J + 6 + 26*4 + 26^2*8 + 26^3*14)) : (26^4*A + 26^3*B + 26^2*C + 26*F + J + 6 + 26*10 + 26^2*4 + 26^3*8 + 26^4*14)
+
+inp w		w = K
+mul x 0		;
+add x z		;
+mod x 26	x = z % 26 = (E == D+7 && C == F && G == H+4 && I == B+5 && J == A+2) ? 0 : (J + 6)
+div z 1		;
+add x 14	x += 14 = (E == D+7 && C == F && G == H+4 && I == B+5 && J == A+2) ? 14 : (J + 20)
+eql x w		;
+eql x 0		x = (x != K) = 1
+mul y 0		;
+add y 25	;
+mul y x		;
+add y 1		y = 25 * x + 1 = 26
+mul z y		z *= y
+mul y 0
+add y w
+add y 0
+mul y x		y = x * w + 0 = K + 0
+add z y		z += y = (E == D+7) ? ((C == F) ? ((G == H+4) ? ((I = B+5) ? ((J == A+2) ? (K + 0) : (26*J + K + 0 + 26*6)) : (26^2*A + 26*J + K + 0 + 26*6 + 26^2*14)) : (26^3*A + 26^2*B + 26*J + K + 0 + 26*6 + 26^2*8 + 26^3*14)) : (26^4*A + 26^3*B + 26^2*C + 26*J + K + 0 + 26*6 + 26^2*4 + 26^3*8 + 26^4*14)) : (26^5*A + 26^4*B + 26^3*C + 26^2*F + 26*J + K + 0 + 26*6 + 26^2*10 + 26^3*4 + 26^4*8 + 26^5*14)
+
+inp w		w = L
+mul x 0		;
+add x z		;
+mod x 26	x = z % 26 = K
+div z 26	z /= 26 = (E == D+7) ? ((C == F) ? ((G == H+4) ? ((I = B+5) ? ((J == A+2) ? 0 : J + 6) : (26*A + J + 6 + 26*14)) : (26^2*A + 26*B + J + 6 + 26*8 + 26^2*14)) : (26^3*A + 26^2*B + 26*C + J + 6 + 26*4 + 26^2*8 + 26^3*14)) : (26^4*A + 26^3*B + 26^2*C + 26*F + J + 6 + 26*10 + 26^2*4 + 26^3*8 + 26^4*14)
+add x -6	x -= 6 = K - 6
+eql x w		;
+eql x 0		x = (x != w) = (L != K-6)
+mul y 0		;
+add y 25	;
+mul y x		;
+add y 1		y = (L == K-6) ? 1 : 26
+mul z y		z *= y
+mul y 0
+add y w
+add y 9
+mul y x		y = (L == K-6) ? 0 : L + 9
+add z y		z += y =
+
+((L == K-6) ? 0 : L + 9) + (E == D+7) ? ((C == F) ? ((G == H+4) ? ((I = B+5) ? ((J == A+2) ? 0 : J + 6) : (26*A + J + 6 + 26*14)) : (26^2*A + 26*B + J + 6 + 26*8 + 26^2*14)) : (26^3*A + 26^2*B + 26*C + J + 6 + 26*4 + 26^2*8 + 26^3*14)) : (26^4*A + 26^3*B + 26^2*C + 26*F + J + 6 + 26*10 + 26^2*4 + 26^3*8 + 26^4*14)
+
+inp w		w = M
+mul x 0		;
+add x z		;
+mod x 26	x = z % 26 = (E == D+7 && C == F && G == H+4 && I == B+5 && J == A+2 && L == K-6) ? 0 : (J + 6)
+div z 1		;
+add x 11
+eql x w		0
+eql x 0		1
+mul y 0
+add y 25
+mul y x
+add y 1		
+mul z y		z += 26
+mul y 0
+add y w
+add y 13
+mul y x
+add z y		z += M + 13
+
+inp w		w = N
+mul x 0
+add x z
+mod x 26	z = z % 26 = M + 13
+div z 26	z /= 26 = 
+
+((L == K-6) ? 0 : L + 9) + (E == D+7) ? ((C == F) ? ((G == H+4) ? ((I = B+5) ? ((J == A+2) ? 0 : J + 6) : (26*A + J + 6 + 26*14)) : (26^2*A + 26*B + J + 6 + 26*8 + 26^2*14)) : (26^3*A + 26^2*B + 26*C + J + 6 + 26*4 + 26^2*8 + 26^3*14)) : (26^4*A + 26^3*B + 26^2*C + 26*F + J + 6 + 26*10 + 26^2*4 + 26^3*8 + 26^4*14)
+
+add x -12	x -= 12 = M + 1
+eql x w		x = (N == M+1)
+eql x 0		z = (N != M+1)
+mul y 0
+add y 25
+mul y x
+add y 1		y = (N == M+1) ? 1 : 26
+mul z y		z *= y
+mul y 0
+add y w
+add y 12
+mul y x		y = (N == M+1) ? 0 : N + 12
+add z y
+
+
+So, any input ABCDEFGHIJKLMN needs to satisfy all of:
+(N == M+1)
+(E == D+7)
+(C == F)
+(G == H+4)
+(I == B+5)
+(J == A+2)
+(L == K-6)
+
+
+
+Part 1, for maximum value:
+maximize A (J == A+2)
+A = 7, J = 9
+maximize B (I == B+5)
+B = 4, I = 9
+maximize C (C == F)
+C = 9, F = 9
+maximize D (E == D+7)
+D = 2, E = 9
+maximize G (G == H+4)
+G = 9, H = 5
+maximize K (L == K-6)
+K = 9, L = 3
+maximize M (N == M+1)
+M = 8, N = 9
+
+So
+
+ABCDEFGHIJKLMN
+74929995999389
+
+Part 2, for minimum value
+minimize A (J == A+2)
+A = 1, J = 3
+minimize B (I == B+5)
+B = 1, I = 6
+minimize C (C == F)
+C = 1, F = 1
+minimize D (E == D+7)
+D = 1, E = 8
+minimize G (G == H+4)
+G = 5, H = 1
+minimize K (L == K-6)
+K = 7, L = 1
+minimize M (N == M+1)
+M = 1, N = 2
+
+So
+
+ABCDEFGHIJKLMN
+11118151637112
