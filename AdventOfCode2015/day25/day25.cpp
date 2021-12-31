@@ -1,12 +1,13 @@
-// day25.cpp : Advent of Code 2021 https://adventofcode.com/2021
+// day25.cpp : Advent of Code 2015 https://adventofcode.com/2015
 // Solution by trave.uk 25/12/2021 https://github.com/trave-uk/AdventOfCode
 //
 
 #include "stdafx.h"
 
-void Process(const char* filename)
+void Process(const char* filename, int64 expectedPart1 = -1, int64 expectedPart2 = -1)
 {
-	int result = 0;
+	int64 part1 = 0;
+	int64 part2 = 0;
 	char* buffer = new char[65536];
 	FILE *fp = fopen(filename, "rt");
 	while (!feof(fp))
@@ -24,7 +25,11 @@ void Process(const char* filename)
 	fclose(fp);
 	delete[] buffer;
 
-	printf("%s: Part 1: %d\n", filename, result);
+	assert(expectedPart1 == -1 || expectedPart1 == part1);
+	printf("%s: Part 1: %lld\n", filename, part1);
+
+//	assert(expectedPart2 == -1 || expectedPart2 == part2);
+//	printf("%s: Part 2: %lld\n", filename, part2);
 }
 
 int main()
