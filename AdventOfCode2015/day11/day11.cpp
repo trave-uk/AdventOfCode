@@ -1,41 +1,85 @@
 // day11.cpp : Advent of Code 2015 https://adventofcode.com/2015
-// Solution by trave.uk 11/12/2021 https://github.com/trave-uk/AdventOfCode
+// Solution by trave.uk 6/1/2022 https://github.com/trave-uk/AdventOfCode
 //
 
 #include "stdafx.h"
 
-void Process(const char* filename, int64 expectedPart1 = -1, int64 expectedPart2 = -1)
+void Increment(std::string &password)
 {
-	int64 part1 = 0;
-	int64 part2 = 0;
-	char* buffer = new char[65536];
-	FILE *fp = fopen(filename, "rt");
-	while (!feof(fp))
+	int pos = password.length() - 1;
+	for(;;)
 	{
-		char* thisLine = fgets(buffer, 65536, fp);
-		if (thisLine)
+		assert(pos >= 0);
+		++password[pos];
+		if (password[pos] > 'z')
 		{
-			thisLine[strcspn(thisLine, "\n\r")] = '\0';
-			if (*thisLine)
-			{
-
-			}
+			password[pos] = 'a';
+			--pos;
+		}
+		else
+		{
+			break;
 		}
 	}
-	fclose(fp);
-	delete[] buffer;
+}
 
-	assert(expectedPart1 == -1 || expectedPart1 == part1);
-	printf("%s: Part 1: %lld\n", filename, part1);
+bool IsValid(std::string password)
+{
+	// cannot contain 'i', 'o' or 'l'.
+	if (password.find('i') != std::string::npos ||
+		password.find('o') != std::string::npos ||
+		password.find('l') != std::string::npos)
+	{
+		return false;
+	}
+	
+	bool valid1 = false;
+	int count2 = 0;
+	char last1 = 0;
+	char last2 = 0;
+	char last = 0;
+	for (char c : password)
+	{
+		if (c == last1 + 1 && last1 == last2 + 1)
+			valid1 = true;
+		last2 = last1;
+		last1 = c;
 
-//	assert(expectedPart2 == -1 || expectedPart2 == part2);
-//	printf("%s: Part 2: %lld\n", filename, part2);
+		if (last == c)
+		{
+			++count2;
+			last = 0;
+		}
+		else
+		{
+			last = c;
+		}
+	}
+
+	return valid1 && count2 >= 2;
+}
+
+std::string Process(std::string input, int part, std::string expected = "")
+{
+	std::string result = input;
+	do
+	{
+		Increment(result);
+	} while (!IsValid(result));
+	assert(expected == "" || expected == result);
+	printf("%s: Part %d: %s\n", input.c_str(), part, result.c_str());
+	return result;
 }
 
 int main()
 {
-	Process("example.txt");
-	Process("input.txt");
+	assert(!IsValid("hijklmmn"));
+	assert(!IsValid("abbceffg"));
+	assert(!IsValid("abbcegjk"));
+	Process("abcdefgh", 1, "abcdffaa");
+	Process("ghijklmn", 1, "ghjaabcc");
+	std::string part1 = Process("hxbxwxba", 1);
+	Process(part1, 2);
 
 	return 0;
 }
