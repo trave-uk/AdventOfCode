@@ -1,5 +1,7 @@
 #pragma once
 
+#define _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING
+
 #include <stdio.h>
 #include <tchar.h>
 #include <stdlib.h>
