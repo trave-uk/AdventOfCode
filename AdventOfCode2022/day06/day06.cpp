@@ -4,10 +4,10 @@
 
 #include "stdafx.h"
 
-void Process(const char* filename, int64 expectedPart1 = -1, int64 expectedPart2 = -1)
+void Process(const char* filename, int part, int64 expectedResult = -1)
 {
-	int64 part1 = 0;
-	int64 part2 = 0;
+	const int size = (part == 1) ? 4 : 14;
+	int64 result = 0;
 	char* buffer = new char[65536];
 	FILE *fp = fopen(filename, "rt");
 	while (!feof(fp))
@@ -18,24 +18,42 @@ void Process(const char* filename, int64 expectedPart1 = -1, int64 expectedPart2
 			thisLine[strcspn(thisLine, "\n\r")] = '\0';
 			if (*thisLine)
 			{
-
+				for (int i = 0; i <= strlen(thisLine) - size; ++i)
+				{
+					bool notFound = false;
+					for (int j = 1; j < size; ++j)
+					{
+						for (int k = 0; k < j; ++k)
+						{
+							if (thisLine[i + j] == thisLine[i + k])
+								notFound = true;
+						}
+					}
+					if (!notFound)
+					{
+						result = i + size;
+						break;
+					}
+				}
 			}
 		}
 	}
 	fclose(fp);
 	delete[] buffer;
 
-	assert(expectedPart1 == -1 || expectedPart1 == part1);
-	printf("%s: Part 1: %lld\n", filename, part1);
-
-//	assert(expectedPart2 == -1 || expectedPart2 == part2);
-//	printf("%s: Part 2: %lld\n", filename, part2);
+	assert(expectedResult == -1 || expectedResult == result);
+	printf("%s: Part %d: %lld\n", filename, part, result);
 }
 
 int main()
 {
-	Process("example.txt");
-	Process("input.txt");
+	Process("example1.txt", 1, 7);
+	Process("example2.txt", 1, 5);
+	Process("example3.txt", 1, 6);
+	Process("example4.txt", 1, 10);
+	Process("example5.txt", 1, 11);
+	Process("input.txt", 1);
+	Process("input.txt", 2);
 
 	return 0;
 }
