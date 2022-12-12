@@ -149,8 +149,8 @@ template<class tNode> void print(coord& start, coord& goal, std::map<coord, tNod
 // optional class to derive from for the tNode class, implementing the required interface
 struct INode
 {
-	virtual bool isBlocked() const { return false; }
-	virtual int getCost() const { return 1; }
+	virtual bool isBlocked(coord& from) const { return false; }
+	virtual int getCost(coord& from) const { return 1; }
 };
 
 // class tNode must have an "isBlocked" function thus:
@@ -217,11 +217,11 @@ template<class tNode> int64 aStarSearch(coord& start, coord& goal, std::map<coor
 			neighbour.first += (dir == 0) - (dir == 1);
 			neighbour.second += (dir == 2) - (dir == 3);
 
-			if (!space.count(neighbour) || space[neighbour].isBlocked())
+			if (!space.count(neighbour) || space[neighbour].isBlocked(current))
 				continue;
 
 			// tentative_gScore is the distance from start to the neighbour through current
-			int64 tentative_gScore = gScore[current] + space[neighbour].getCost();
+			int64 tentative_gScore = gScore[current] + space[neighbour].getCost(current);
 			int64 neighbour_gScore = (gScore.count(neighbour) ? gScore[neighbour] : INT_MAX);
 			if (tentative_gScore < neighbour_gScore)
 			{
