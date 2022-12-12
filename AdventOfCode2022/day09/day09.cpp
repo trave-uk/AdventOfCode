@@ -10,8 +10,8 @@ using Cloud = std::set<Coord>;
 
 void Catch(Coord& T, const Coord& H)
 {
-	int move1 = H.first - T.first;
-	int move2 = H.second - T.second;
+	int64 move1 = H.first - T.first;
+	int64 move2 = H.second - T.second;
 	if (abs(move1) > 1 || abs(move2) > 1)
 	{
 		T.first += sgn(move1);
