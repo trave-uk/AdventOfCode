@@ -71,6 +71,15 @@ public:
 		first = x;
 		second = y;
 	}
+	coord(std::string coords)
+	{
+		int m = sscanf(coords.c_str(), "%lld,%lld", &first, &second);
+		assert(m == 2);
+	}
+	operator bool() const
+	{
+		return (first || second);
+	}
 	// default (only) heuristic: Manhattan distance
 	static int64 heuristic(coord& start, coord& goal)
 	{
