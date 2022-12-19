@@ -4,6 +4,8 @@
 
 #include "stdafx.h"
 
+bool verbose = false;
+
 // Blueprint 1: Each ore robot costs 4 ore. Each clay robot costs 2 ore. Each obsidian robot costs 3 ore and 14 clay. Each geode robot costs 2 ore and 7 obsidian.
 enum Resource
 {
@@ -23,6 +25,14 @@ const char* ResourceNames[] =
 	"geode"
 };
 
+const char* ResourceDescriptions[] =
+{
+	"ore-collecting robot",
+	"clay-collecting robot",
+	"obsidian-collecting robot",
+	"geode-cracking robot"
+};
+
 Resource Decode(char* name)
 {
 	for (int i = 0; i < COUNT; ++i)
@@ -35,6 +45,11 @@ Resource Decode(char* name)
 	return NONE;
 }
 
+char Identifier(Resource r)
+{
+	int index = (r == OBSIDIAN) ? 1 : 0;
+	return toupper(ResourceNames[r][index]);
+}
 using Counters = std::array<int64, COUNT>;
 
 struct Robot
@@ -108,6 +123,7 @@ struct State
 	Counters robots;
 	Counters resources;
 	std::bitset<COUNT> buyNext;
+	std::string path;
 };
 
 struct Blueprint
@@ -159,8 +175,67 @@ struct Blueprint
 		}
 	}
 
+	void OutputDetailedPath(std::string path) const
+	{
+		State state;
+		state.robots[ORE] = 1;
+		int minute = 0;
+		for (char id : path)
+		{
+			// == Minute 3 ==
+			// Spend 2 ore to start building a clay-collecting robot.
+			// 1 ore-collecting robot collects 1 ore; you now have 1 ore.
+			// The new clay-collecting robot is ready; you now have 1 of them.
+
+			++minute;
+			printf("\n== Minute %d ==\n", minute);
+			state.Tick();
+			Resource newRobot = NONE;
+			switch (id)
+			{
+			case 'O':
+				newRobot = ORE;
+				printf("Spend %d ore to start building an ore-collecting robot.\n", robots[ORE].cost1);
+				break;
+			case 'C':
+				newRobot = CLAY;
+				printf("Spend %d ore to start building a clay-collecting robot.\n", robots[CLAY].cost1);
+				break;
+			case 'B':
+				newRobot = OBSIDIAN;
+				printf("Spend %d ore and %d clay to start building an obsidian-collecting robot.\n", robots[OBSIDIAN].cost1, robots[OBSIDIAN].cost2);
+				break;
+			case 'G':
+				newRobot = GEODE;
+				printf("Spend %d ore and %d obsidian to start building a geode-cracking robot.\n", robots[GEODE].cost1, robots[GEODE].cost2);
+				break;
+			default:
+				assert(id == '-');
+				break;
+			}
+			if (newRobot != NONE)
+			{
+				robots[newRobot].Buy(state.resources);
+			}
+			for (int ri = 0; ri < COUNT; ++ri)
+			{
+				if (state.robots[ri] > 0)
+				{
+					printf("%lld %s%s %s%s %lld %s%s; you now have %lld %s%s%s.\n", state.robots[ri], ResourceDescriptions[ri], (state.robots[ri] == 1) ? "" : "s", (ri == GEODE) ? "crack" : "collect", (state.robots[ri] == 1) ? "s" : "", state.robots[ri], ResourceNames[ri], (state.robots[ri] == 1 || ri != GEODE) ? "" : "s", state.resources[ri], (ri == GEODE) ? "open " : "", ResourceNames[ri], (state.resources[ri] == 1 || ri != GEODE) ? "" : "s");
+				}
+			}
+			if (newRobot != NONE)
+			{
+				++state.robots[newRobot];
+				printf("The new %s is ready; you now have %lld of them.\n", ResourceDescriptions[newRobot], state.robots[newRobot]);
+			}
+		}
+		printf("\n");
+	}
+
 	int64 Process(int steps = 24) const
 	{
+		double startTime = GetMilliseconds();
 		// Find the maximum number of geodes that can be created.
 		State state;
 		state.robots[ORE] = 1;
@@ -168,6 +243,7 @@ struct Blueprint
 		std::stack<State> s;
 		s.push(state);
 		int64 maxGeodes = 0;
+		std::string bestPath;
 		while (!s.empty())
 		{
 			State t = s.top();
@@ -179,6 +255,7 @@ struct Blueprint
 				if (t.resources[GEODE] > maxGeodes)
 				{
 					maxGeodes = t.resources[GEODE];
+					bestPath = t.path;
 				}
 				continue;
 			}
@@ -192,6 +269,8 @@ struct Blueprint
 				u.Tick();                         // generate resources with current robots
 				++u.robots[GEODE];                // add a geode robot
 				u.buyNext = std::bitset<COUNT>(); // buy anything
+				if (verbose)
+					u.path.append("G");
 				s.push(u);
 			}
 			else
@@ -217,6 +296,8 @@ struct Blueprint
 						u.Tick();                         // generate resources with current robots
 						++u.robots[r.generates];          // add a robot of this type
 						u.buyNext = std::bitset<COUNT>(); // buy anything
+						if (verbose)
+							u.path.append(1, Identifier(r.generates));
 						s.push(u);
 					}
 					else
@@ -232,11 +313,19 @@ struct Blueprint
 					State u = t;
 					u.Tick();
 					u.buyNext = couldntBuy;
+					if (verbose)
+						u.path.append("-");
 					s.push(u);
 				}
 			}
 		}
-		//printf("Blueprint %d: max geodes: %lld\n", index, maxGeodes);
+		if (verbose)
+		{
+			printf("(%0.04fms) Blueprint %d: max geodes: %lld \n", GetMilliseconds() - startTime, index, maxGeodes);
+			printf("Path: %s\n", bestPath.c_str());
+			OutputDetailedPath(bestPath);
+		}
+
 		return maxGeodes;
 	}
 
