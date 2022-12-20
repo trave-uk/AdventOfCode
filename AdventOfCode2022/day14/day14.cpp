@@ -30,7 +30,7 @@ void DrawLine(Space& space, const line& l)
 	space.insert(std::make_pair(l.to, '#'));
 }
 
-bool TestCoord(Space& space, coord& const c)
+bool TestCoord(Space& space, const coord& c)
 {
 	return (space.count(c) != 0); 
 }

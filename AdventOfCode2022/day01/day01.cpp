@@ -11,7 +11,7 @@ void Process(const char* filename, int64 expectedPart1 = -1, int64 expectedPart2
 	char* buffer = new char[65536];
 	FILE *fp = fopen(filename, "rt");
 	int64 current = 0;
-	std::vector<int> all;
+	std::vector<int64> all;
 	while (!feof(fp))
 	{
 		char* thisLine = fgets(buffer, 65536, fp);

@@ -175,10 +175,11 @@ struct Chamber : std::vector<std::string>
 		int64 rocksDiff = -1;
 		int sameCount = 0;
 		int64 heightToAdd = 0;
+		int64 windLength = wind.length();
 		for (int64 r = 0; r < rocks; ++r)
 		{
 			int64 height = size() - 1;
-			if (r == wind.length())
+			if (r == windLength)
 			{
 				// arbitrary time to assume rocks have settled and start looking for a pattern
 				snapshotWindIndex = windIndex;
@@ -186,7 +187,7 @@ struct Chamber : std::vector<std::string>
 				lastHeight = height;
 				lastRock = r;
 			}
-			else if (r > wind.length() && snapshotWindIndex == windIndex && snapshotRockIndex == nextRock)
+			else if (r > windLength && snapshotWindIndex == windIndex && snapshotRockIndex == nextRock)
 			{
 				int64 diff = height - lastHeight;
 				int64 rdiff = r - lastRock;
