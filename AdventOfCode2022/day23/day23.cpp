@@ -6,6 +6,7 @@
 
 void Process(const char* filename, int64 expectedPart1 = -1, int64 expectedPart2 = -1)
 {
+	double start = GetMilliseconds();
 	int64 part1 = 0;
 	int64 part2 = 0;
 	char* buffer = new char[65536];
@@ -27,16 +28,16 @@ void Process(const char* filename, int64 expectedPart1 = -1, int64 expectedPart2
 
 	if (expectedPart1 != -1)
 	{
-		printf("%s: Part 1 expected: %lld\n", filename, expectedPart1);
+		printf("[%.2f] %s: Part 1 expected: %lld\n", GetMilliseconds() - start, filename, expectedPart1);
 	}
-	printf("%s: Part 1: %lld\n", filename, part1);
+	printf("[%.2f] %s: Part 1: %lld\n", GetMilliseconds() - start, filename, part1);
 	assert(expectedPart1 == -1 || expectedPart1 == part1);
 
 	if (expectedPart2 != -1)
 	{
-		printf("%s: Part 2 expected: %lld\n", filename, expectedPart2);
+		printf("[%.2f] %s: Part 2 expected: %lld\n", GetMilliseconds() - start, filename, expectedPart2);
 	}
-	printf("%s: Part 2: %lld\n", filename, part2);
+	printf("[%.2f] %s: Part 2: %lld\n", GetMilliseconds() - start, filename, part2);
 	assert(expectedPart2 == -1 || expectedPart2 == part2);
 }
 
