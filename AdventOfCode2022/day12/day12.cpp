@@ -17,7 +17,12 @@ struct Node : public INode
 	char height = 0; // 'a' to 'z'
 };
 
-std::map<coord, Node> space;
+struct Space : public std::map<coord, Node>
+{
+	int64 step(int64 steps) { return 0; }
+	bool canWait(coord pos) { return false; }
+};
+Space space;
 
 bool Node::isBlocked(coord& from) const 
 {
@@ -82,7 +87,7 @@ void Process(const char* filename, int64 expectedPart1 = -1, int64 expectedPart2
 	delete[] buffer;
 
 	std::vector<coord> path;
-	part1 = aStarSearch(start, end, space, &path);
+	part1 = aStarSearch<Node>(start, end, space, &path);
 	assert(expectedPart1 == -1 || expectedPart1 == part1);
 	printf("%s: Part 1: %lld\n", filename, part1);
 
@@ -92,7 +97,7 @@ void Process(const char* filename, int64 expectedPart1 = -1, int64 expectedPart2
 	{
 		if (pos.second.height == 'a')
 		{
-			int64 d = aStarSearch(pos.first, end, space);
+			int64 d = aStarSearch<Node>(pos.first, end, space);
 			if (d != -1)
 			{
 				distances.insert(d);

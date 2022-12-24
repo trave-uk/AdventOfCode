@@ -100,6 +100,11 @@ public:
 		first /= rhs;
 		second /= rhs;
 	}
+	void operator*=(int64 rhs)
+	{
+		first *= rhs;
+		second *= rhs;
+	}
 	int64 length()
 	{
 		return max(abs(first), abs(second));
@@ -124,7 +129,7 @@ static void gotoxy(short x, short y)
 	SetConsoleCursorPosition(h, c);
 }
 
-template<class tNode> void print(coord& start, coord& goal, std::map<coord, tNode>& space, coord& max, std::set<coord>& openSet)
+template<class tNode, class tSpace> void print(coord& start, coord& goal, tSpace& space, coord& max, std::set<coord>& openSet)
 {
 	// TODO: print the entire available space, highlighting the start, goal and contents of openSet.
 	coord pos;
@@ -164,7 +169,25 @@ struct INode
 
 // class tNode must have an "isBlocked" function thus:
 //  bool tNode::isBlocked();
-template<class tNode> int64 aStarSearch(coord& start, coord& goal, std::map<coord, tNode>& space, std::vector<coord>* pPath = nullptr)
+// tSpace must derive from std::map<coord, tNode> and contain a function "step":
+//  void tSpace::step(int steps);
+//  bool tSpace::canWait(coord c)
+struct Set
+{
+	Set() = default;
+	Set(coord p, int64 s = 0)
+		: pos(p)
+		, steps(s)
+	{
+	}
+	bool operator<(const Set& rhs) const
+	{
+		return (pos < rhs.pos) || (pos == rhs.pos && steps < rhs.steps);
+	}
+	coord pos;
+	int64 steps;
+};
+template<class tNode, class tSpace> int64 aStarSearch(coord& start, coord& goal, tSpace& space, std::vector<coord>* pPath = nullptr)
 {
 #ifdef ASTARDEBUG
 	// Find the maximum extents of space
@@ -177,11 +200,11 @@ template<class tNode> int64 aStarSearch(coord& start, coord& goal, std::map<coor
 			max.second = node.first.second;
 	}
 #endif
-	std::set<coord> openSet;
-	openSet.insert(start);
-	std::map<coord, int64> gScore;
+	std::set<Set> openSet;
+	openSet.insert(Set(start, 0));
+	std::map<Set, int64> gScore;
 	gScore[start] = 0;
-	std::map<coord, int64> fScore;
+	std::map<Set, int64> fScore;
 	fScore[start] = coord::heuristic(start, goal);
 
 	// For node n, cameFrom[n] is the node immediately preceding it on the cheapest path from start to n currently known.
@@ -193,8 +216,8 @@ template<class tNode> int64 aStarSearch(coord& start, coord& goal, std::map<coor
 		print(start, goal, space, max, openSet);
 #endif
 		int64 minF = INT_MAX;
-		coord current;
-		for (const coord& c : openSet)
+		Set current;
+		for (const Set& c : openSet)
 		{
 			if (fScore.count(c) && fScore[c] < minF)
 			{
@@ -203,41 +226,48 @@ template<class tNode> int64 aStarSearch(coord& start, coord& goal, std::map<coor
 			}
 		}
 
-		if (current == goal)
+		if (current.pos == goal)
 		{
+			int64 result = fScore[current];
 			if (pPath)
 			{
 				pPath->clear();
-				pPath->push_back(current);
-				while (current != start)
+				pPath->push_back(current.pos);
+				while (current.pos != start)
 				{
-					current = cameFrom[current];
-					pPath->push_back(current);
+					current.pos = cameFrom[current.pos];
+					pPath->push_back(current.pos);
 				}
 				std::reverse(pPath->begin(), pPath->end());
 			}
-			return fScore[goal];
+			return result;
 		}
 
 		openSet.erase(current);
-		for (int dir = 0; dir < 4; ++dir)
+		tSpace testSpace = space;
+		int64 steps = testSpace.step(current.steps + 1);
+		for (int dir = 0; dir < 5; ++dir)
 		{
-			coord neighbour = current;
-			neighbour.first += (dir == 0) - (dir == 1);
-			neighbour.second += (dir == 2) - (dir == 3);
+			if (dir == 4 && !testSpace.canWait(current.pos))
+				continue;
 
-			if (!space.count(neighbour) || space[neighbour].isBlocked(current))
+			Set neighbour = current;
+			neighbour.pos.first += (dir == 0) - (dir == 1);
+			neighbour.pos.second += (dir == 2) - (dir == 3);
+			neighbour.steps = steps;
+
+			if (!testSpace.count(neighbour.pos) || testSpace[neighbour.pos].isBlocked(current.pos))
 				continue;
 
 			// tentative_gScore is the distance from start to the neighbour through current
-			int64 tentative_gScore = gScore[current] + space[neighbour].getCost(current);
+			int64 tentative_gScore = gScore[current] + testSpace[neighbour.pos].getCost(current.pos);
 			int64 neighbour_gScore = (gScore.count(neighbour) ? gScore[neighbour] : INT_MAX);
 			if (tentative_gScore < neighbour_gScore)
 			{
 				// This path to neighbour is better than any previous one. Record it!
-				cameFrom[neighbour] = current;
+				cameFrom[neighbour.pos] = current.pos;
 				gScore[neighbour] = tentative_gScore;
-				fScore[neighbour] = tentative_gScore + coord::heuristic(neighbour, goal);
+				fScore[neighbour] = tentative_gScore + coord::heuristic(neighbour.pos, goal);
 				openSet.insert(neighbour);
 			}
 		}
