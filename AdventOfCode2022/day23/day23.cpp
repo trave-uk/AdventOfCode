@@ -180,7 +180,8 @@ void Process(const char* filename, int64 expectedPart1 = -1, int64 expectedPart2
 			thisLine[strcspn(thisLine, "\n\r")] = '\0';
 			if (*thisLine)
 			{
-				for (pos.first = 0; pos.first < strlen(thisLine); ++pos.first)
+				int len = strlen(thisLine);
+				for (pos.first = 0; pos.first < len; ++pos.first)
 				{
 					if (thisLine[pos.first] == '#')
 					{
