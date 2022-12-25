@@ -4,11 +4,59 @@
 
 #include "stdafx.h"
 
-void Process(const char* filename, int64 expectedPart1 = -1, int64 expectedPart2 = -1)
+int64 FromSnafu(std::string input)
+{
+	int64 result = 0;
+	for (char c : input)
+	{
+		result *= 5;
+		if (isdigit(c))
+		{
+			result += c - '0';
+		}
+		else if (c == '-')
+		{
+			result -= 1;
+		}
+		else if (c == '=')
+		{
+			result -= 2;
+		}
+	}
+	return result;
+}
+
+std::string ToSnafu(int64 num)
+{
+	// first, just a normal base 5 number. Then, do something with '3's and '4's
+	std::string result = "";
+	int64 x = num;
+	while (x > 0)
+	{
+		int64 digit = x % 5;
+		int64 carry = 0;
+		char c;
+		if (digit < 3)
+		{
+			c = digit + '0';
+		}
+		else
+		{
+			digit -= 5;
+			carry = 1;
+			c = (digit == -1) ? '-' : '=';
+		}
+		result = std::string(1, c) + result;
+		x /= 5;
+		x += carry;
+	}
+	return result;
+}
+
+void Process(const char* filename, std::string expectedPart1 = "")
 {
 	double start = GetMilliseconds();
-	int64 part1 = 0;
-	int64 part2 = 0;
+	int64 total = 0;
 	char* buffer = new char[65536];
 	FILE *fp = fopen(filename, "rt");
 	while (!feof(fp))
@@ -19,31 +67,26 @@ void Process(const char* filename, int64 expectedPart1 = -1, int64 expectedPart2
 			thisLine[strcspn(thisLine, "\n\r")] = '\0';
 			if (*thisLine)
 			{
-
+				total += FromSnafu(thisLine);
 			}
 		}
 	}
 	fclose(fp);
 	delete[] buffer;
 
-	if (expectedPart1 != -1)
+	std::string part1 = ToSnafu(total);
+	assert(total == FromSnafu(part1));
+	if (expectedPart1 != "")
 	{
-		printf("[%.2f] %s: Part 1 expected: %lld\n", GetMilliseconds() - start, filename, expectedPart1);
+		printf("[%.2f] %s: Part 1 expected: %s\n", GetMilliseconds() - start, filename, expectedPart1.c_str());
 	}
-	printf("[%.2f] %s: Part 1: %lld\n", GetMilliseconds() - start, filename, part1);
-	assert(expectedPart1 == -1 || expectedPart1 == part1);
-
-	if (expectedPart2 != -1)
-	{
-		printf("[%.2f] %s: Part 2 expected: %lld\n", GetMilliseconds() - start, filename, expectedPart2);
-	}
-	printf("[%.2f] %s: Part 2: %lld\n", GetMilliseconds() - start, filename, part2);
-	assert(expectedPart2 == -1 || expectedPart2 == part2);
+	printf("[%.2f] %s: Part 1: %s\n", GetMilliseconds() - start, filename, part1.c_str());
+	assert(expectedPart1 == "" || expectedPart1 == part1);
 }
 
 int main()
 {
-	Process("example.txt");
+	Process("example.txt", "2=-1=0");
 	Process("input.txt");
 
 	return 0;
