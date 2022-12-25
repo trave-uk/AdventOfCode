@@ -1,5 +1,7 @@
 #pragma once
 
+#define _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING
+
 #include <stdio.h>
 #include <tchar.h>
 #include <stdlib.h>
@@ -38,3 +40,32 @@ template <typename T> int sgn(T val)
 {
 	return (T(0) < val) - (val < T(0));
 }
+
+// From https://learn.microsoft.com/en-us/windows/win32/api/profileapi/nf-profileapi-queryperformancecounter
+static inline int64 GetTicks()
+{
+    LARGE_INTEGER ticks;
+    if (!QueryPerformanceCounter(&ticks))
+    {
+        assert(false);
+    }
+    return ticks.QuadPart;
+}
+
+static inline double GetMilliseconds()
+{
+    static double frequency = 0;
+    if (!frequency)
+    {
+        LARGE_INTEGER freq;
+        if (!QueryPerformanceFrequency(&freq))
+        {
+            assert(false);
+        }
+        frequency = freq.QuadPart / 1000.0;
+    }
+
+    int64 currentTick = GetTicks();
+    return static_cast<double>(currentTick) / frequency;
+}
+
