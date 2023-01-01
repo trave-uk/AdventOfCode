@@ -5,16 +5,15 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>cpp;h</Extensions>
     </Filter>
-    <Filter Include="Data">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>txt</Extensions>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>Code</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
+      <Filter>Code</Filter>
+    </ClInclude>
+    <ClInclude Include="primes.h">
       <Filter>Code</Filter>
     </ClInclude>
   </ItemGroup>
@@ -25,13 +24,5 @@
     <ClCompile Include="day20.cpp">
       <Filter>Code</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="example.txt">
-      <Filter>Data</Filter>
-    </Text>
-    <Text Include="input.txt">
-      <Filter>Data</Filter>
-    </Text>
   </ItemGroup>
 </Project>
