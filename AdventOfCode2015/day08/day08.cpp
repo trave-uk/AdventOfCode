@@ -17,7 +17,7 @@ void EscapeString(std::string& input)
 			{
 				if (escaped.length() == 4)
 				{
-					result.append(1, strtol(&escaped.front() + 2, nullptr, 16));
+					result.append(1, char(strtol(&escaped.front() + 2, nullptr, 16)));
 					escaped.clear();
 				}
 			}
