@@ -30,10 +30,7 @@
     <Text Include="input.txt">
       <Filter>Data</Filter>
     </Text>
-    <Text Include="example1.txt">
-      <Filter>Data</Filter>
-    </Text>
-    <Text Include="example2.txt">
+    <Text Include="example.txt">
       <Filter>Data</Filter>
     </Text>
   </ItemGroup>

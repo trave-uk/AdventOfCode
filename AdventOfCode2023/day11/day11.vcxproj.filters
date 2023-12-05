@@ -5,6 +5,9 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>cpp;h</Extensions>
     </Filter>
+    <Filter Include="Data">
+      <UniqueIdentifier>{303a30f9-18fd-4201-85c4-a6cac2d979f8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -21,5 +24,13 @@
     <ClCompile Include="day11.cpp">
       <Filter>Code</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="example.txt">
+      <Filter>Data</Filter>
+    </Text>
+    <Text Include="input.txt">
+      <Filter>Data</Filter>
+    </Text>
   </ItemGroup>
 </Project>
