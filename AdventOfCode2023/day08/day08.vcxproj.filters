@@ -33,5 +33,11 @@
     <Text Include="input.txt">
       <Filter>Data</Filter>
     </Text>
+    <Text Include="example2.txt">
+      <Filter>Data</Filter>
+    </Text>
+    <Text Include="example3.txt">
+      <Filter>Data</Filter>
+    </Text>
   </ItemGroup>
 </Project>
