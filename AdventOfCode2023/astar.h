@@ -91,6 +91,11 @@ public:
 		first /= rhs;
 		second /= rhs;
 	}
+	void operator*=(int64 rhs)
+	{
+		first *= rhs;
+		second *= rhs;
+	}
 	int64 length()
 	{
 		return max(abs(first), abs(second));
