@@ -1,6 +1,9 @@
 // Mathematical helpers
 
 using int64 = __int64;
+#ifdef __clang__
+using int128 = __int128;
+#endif
 
 // From https://en.wikipedia.org/wiki/Integer_square_root
 inline int64 integer_sqrt(int64 n)
