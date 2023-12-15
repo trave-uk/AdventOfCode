@@ -1,4 +1,6 @@
 **/.vs/
 **/Debug/
+**/Debug_/
 **/Release/
+**/Release_/
 *.user
