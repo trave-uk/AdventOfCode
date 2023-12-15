@@ -19,10 +19,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="day12.cpp">
+    <ClCompile Include="stdafx.cpp">
       <Filter>Code</Filter>
     </ClCompile>
-    <ClCompile Include="stdafx.cpp">
+    <ClCompile Include="day12_threaded.cpp">
       <Filter>Code</Filter>
     </ClCompile>
   </ItemGroup>

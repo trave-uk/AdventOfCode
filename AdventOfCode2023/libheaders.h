@@ -22,6 +22,10 @@
 #include <deque>
 #include <bitset>
 #include <iterator>
+#include <thread>
+#include <exception>
+#include <mutex>
+#include <chrono>
 
 #include <windows.h>
 #include <processenv.h>
@@ -34,6 +38,7 @@
 #include "astar.h"
 #include "term.h"
 #include "maths.h"
+#include "threads.h"
 
 // From https://stackoverflow.com/questions/1903954/is-there-a-standard-sign-function-signum-sgn-in-c-c
 template <typename T> int sgn(T val)
