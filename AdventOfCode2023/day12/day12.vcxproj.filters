@@ -22,7 +22,7 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Code</Filter>
     </ClCompile>
-    <ClCompile Include="day12_threaded.cpp">
+    <ClCompile Include="day12_threaded2.cpp">
       <Filter>Code</Filter>
     </ClCompile>
   </ItemGroup>
