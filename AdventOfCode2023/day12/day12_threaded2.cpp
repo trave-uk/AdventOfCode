@@ -103,36 +103,13 @@ struct Pattern
 
 std::array<std::array<BitInt, 128>, 2> Pattern::bitpatterns;
 
+Pattern g_pattern;
+Ints g_numbers;
+std::atomic_int64_t g_numPatterns(0);
+
 struct job
 {
-	job(const Pattern& pattern, const std::vector<int64>& numbers, int64 size, int64 line, std::atomic_int64_t& part2)
-		: pattern(pattern)
-		, numbers(numbers)
-		, size(size)
-		, line(line)
-		, part2(part2)
-		, numPatterns(0)
-	{}
-
-	Pattern pattern;
-	const std::vector<int64> numbers;
-	int64 size;
-	int64 line;
-	std::atomic_int64_t& part2;
-	int64 numPatterns;
-};
-
-bool MatchPattern(const Pattern& pattern, const job& j)
-{
-	Pattern p = pattern;
-	int64 extraSpaces = j.pattern.length - p.length;
-	p.PushBits(0, 0, extraSpaces);
-	return j.pattern.Matches(p);
-}
-
-struct patternTest
-{
-	patternTest(Pattern& p, int64 nextNumber, int64 extraSpaces, int64 gaps)
+	job(const Pattern &p, int64 nextNumber, int64 extraSpaces, int64 gaps)
 		: p(p)
 		, nextNumber(nextNumber)
 		, extraSpaces(extraSpaces)
@@ -145,69 +122,62 @@ struct patternTest
 	int64 gaps;
 };
 
-void CountPatterns(job& j, Pattern& p, int64 nextNumber, int64 extraSpaces, int64 gaps)
+ThreadSafeStack<job> jobs;
+
+bool MatchPattern(const Pattern& pattern)
 {
-	std::deque<patternTest> tests;
-	tests.push_back(patternTest(p, nextNumber, extraSpaces, gaps));
+	Pattern p = pattern;
+	int64 extraSpaces = g_pattern.length - p.length;
+	p.PushBits(0, 0, extraSpaces);
+	return g_pattern.Matches(p);
+}
 
-	while (!tests.empty())
+std::atomic_int8_t working(0);
+
+void CountPatterns(job& j)
+{
+	if (j.extraSpaces == 0)
 	{
-		patternTest test = tests.back();
-		tests.pop_back();
+		while (j.nextNumber < g_numbers.size())
+		{
+			j.p.PushBits(1, 1, g_numbers[j.nextNumber++]);
+			if (j.nextNumber < g_numbers.size())
+				j.p.PushBits(0, 1, 1);
+		}
+		if (MatchPattern(j.p))
+			++g_numPatterns;
+		return;
+	}
+	if (j.gaps == 1)
+	{
+		j.p.PushBits(0, 1, j.extraSpaces);
+		if (MatchPattern(j.p))
+			++g_numPatterns;
+		return;
+	}
+	if (!MatchPattern(j.p))
+		return;
+	int64 nextNumber2 = j.nextNumber + 1;
+	for (int64 thisGap = 0; thisGap <= j.extraSpaces; ++thisGap)
+	{
+		Pattern p2 = j.p;
 
-		if (test.extraSpaces == 0)
+		p2.PushBits(0, 1, thisGap);
+		p2.PushBits(1, 1, g_numbers[j.nextNumber]);
+		if (nextNumber2 < g_numbers.size())
+			p2.PushBits(0, 1, 1);
+		
+		if (working < 16)
+			jobs.push(job(p2, nextNumber2, j.extraSpaces - thisGap, j.gaps - 1));
+		else
 		{
-			while (test.nextNumber < j.numbers.size())
-			{
-				test.p.PushBits(1, 1, j.numbers[test.nextNumber++]);
-				if (test.nextNumber < j.numbers.size())
-					test.p.PushBits(0, 1, 1);
-			}
-			if (MatchPattern(test.p, j))
-				++j.numPatterns;
-			continue;
-		}
-		if (test.gaps == 1)
-		{
-			test.p.PushBits(0, 1, test.extraSpaces);
-			if (MatchPattern(test.p, j))
-				++j.numPatterns;
-			continue;
-		}
-		if (!MatchPattern(test.p, j))
-			continue;
-		int64 nextNumber2 = test.nextNumber + 1;
-		for (int64 thisGap = 0; thisGap <= test.extraSpaces; ++thisGap)
-		{
-			patternTest test2 = test;
-			test2.p.PushBits(0, 1, thisGap);
-			test2.p.PushBits(1, 1, j.numbers[test.nextNumber]);
-			if (nextNumber2 < j.numbers.size())
-				test2.p.PushBits(0, 1, 1);
-			test2.nextNumber = nextNumber2;
-			test2.extraSpaces -= thisGap;
-			--test2.gaps;
-			tests.push_back(test2);
+			job j2(p2, nextNumber2, j.extraSpaces - thisGap, j.gaps - 1);
+			CountPatterns(j2);
 		}
 	}
 }
 
-int64 CalculateScore(job &j)
-{
-	// find all patterns that match the numbers
-	int64 extraSpaces = j.pattern.length - j.size; // the number of extra spaces that could be between banks of '#'
-	int64 gaps = j.numbers.size() + 1; // the number of places that extra spaces can be placed: either side of or between the banks of '#'.
-
-	Pattern p;
-	CountPatterns(j, p, 0, extraSpaces, gaps);
-
-	return j.numPatterns;
-}
-
-
-ThreadSafeQueue<job> jobs;
-
-std::array<std::thread, 15> threads;
+std::array<std::thread, 16> threads;
 
 void worker()
 {
@@ -217,18 +187,57 @@ void worker()
 		{
 			while (true)
 			{
-				std::this_thread::sleep_for(std::chrono::milliseconds(10));
-				job j = jobs.pop_front();
-				CalculateScore(j);
-				printf("line %lld: %lld\n", j.line, j.numPatterns);
-				j.part2 += j.numPatterns;
+				job j = jobs.pop_top();
+				++working;
+				CountPatterns(j);
+				--working;
 			}
 		}
 		catch (finishedThread)
 		{
+			int64 attempts = 10;
+			while (attempts--)
+			{
+				std::this_thread::sleep_for(std::chrono::milliseconds(10));
+				try
+				{
+					job j = jobs.pop_top();
+					CountPatterns(j);
+					break;
+				}
+				catch (finishedThread)
+				{
+					continue;
+				}
+			}
 			return;
 		}
 	}
+}
+
+int64 CalculateScore(const Pattern& pattern, const std::vector<int64>& numbers, int64 size)
+{
+	// find all patterns that match the numbers
+	int64 extraSpaces = pattern.length - size; // the number of extra spaces that could be between banks of '#'
+	int64 gaps = numbers.size() + 1; // the number of places that extra spaces can be placed: either side of or between the banks of '#'.
+
+	// so, for a list of ints size (gaps), find all the ways that the extra spaces can be distributed.
+	g_numPatterns = 0;
+	g_pattern = pattern;
+	g_numbers = numbers;
+	Pattern p;
+	jobs.push(job(p, 0, extraSpaces, gaps));
+
+	for (std::thread& thread : threads)
+	{
+		thread = std::thread(worker);
+	}
+	for (std::thread& thread : threads)
+	{
+		thread.join();
+	}
+
+	return g_numPatterns;
 }
 
 void Process(const char* filename, int64 expectedPart1 = -1, int64 expectedPart2 = -1)
@@ -236,12 +245,9 @@ void Process(const char* filename, int64 expectedPart1 = -1, int64 expectedPart2
 	Pattern::init();
 	char* buffer = new char[65536];
 	FILE* fp = fopen(filename, "rt");
-	std::atomic_int64_t part1(0);
-	std::atomic_int64_t part2(0);
-	int64 _part1 = 0;
-	int64 _part2 = 0;
+	int64 part1 = 0;
+	int64 part2 = 0;
 	int64 maxLength = 0;
-	int64 line = 1;
 	while (!feof(fp))
 	{
 		char* thisLine = fgets(buffer, 65536, fp);
@@ -265,10 +271,9 @@ void Process(const char* filename, int64 expectedPart1 = -1, int64 expectedPart2
 					number = strtok(nullptr, ",");
 					size += num + 1;
 				}
-				job j(pattern, numbers, size, line, part1);
-				int64 part1score = CalculateScore(j);
-				_part1 += part1score;
-				printf("line %lld: %lld\n", line, part1score);
+				int64 part1score = CalculateScore(pattern, numbers, size);
+				part1 += part1score;
+				printf("part 1: %lld\n", part1score);
 
 				// for part 2, brute force it, but multithreaded
 				Pattern pattern2 = pattern;
@@ -279,32 +284,21 @@ void Process(const char* filename, int64 expectedPart1 = -1, int64 expectedPart2
 					numbers2.insert(numbers2.end(), numbers.begin(), numbers.end());
 				}
 				int64 size2 = size * 5 + 4;;
-				
-				jobs.push(job(pattern2, numbers2, size2, line, part2));
-//				int64 part2score = CalculateScore(pattern2, numbers2, size2);
-//				part2 += part2score;
-//				printf("line %lld: p1: %lld p2: %lld\n", line++, part1score, part2score);
-				line++;
+
+				int64 part2score = CalculateScore(pattern2, numbers2, size2);
+				part2 += part2score;
+				printf("part 2: %lld\n", part2score);
 			}
 		}
 	}
 	fclose(fp);
 	delete[] buffer;
 
-	assert(expectedPart1 == -1 || expectedPart1 == _part1);
-	printf("%s: Part 1: %lld\n", filename, _part1);
+	assert(expectedPart1 == -1 || expectedPart1 == part1);
+	printf("%s: Part 1: %lld\n", filename, part1);
 
-	for (std::thread& thread : threads)
-	{
-		thread = std::thread(worker);
-	}
-	for (std::thread& thread : threads)
-	{
-		thread.join();
-	}
-	_part2 = part2;
-	assert(expectedPart2 == -1 || expectedPart2 == _part2);
-	printf("%s: Part 2: %lld\n", filename, _part2);
+	assert(expectedPart2 == -1 || expectedPart2 == part2);
+	printf("%s: Part 2: %lld\n", filename, part2);
 
 }
 
