@@ -26,6 +26,7 @@
 #include <exception>
 #include <mutex>
 #include <chrono>
+#include <tuple>
 
 #include <windows.h>
 #include <processenv.h>

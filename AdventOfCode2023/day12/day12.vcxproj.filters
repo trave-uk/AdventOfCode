@@ -22,7 +22,7 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Code</Filter>
     </ClCompile>
-    <ClCompile Include="day12_threaded2.cpp">
+    <ClCompile Include="day12_restart.cpp">
       <Filter>Code</Filter>
     </ClCompile>
   </ItemGroup>
@@ -31,6 +31,12 @@
       <Filter>Data</Filter>
     </Text>
     <Text Include="input.txt">
+      <Filter>Data</Filter>
+    </Text>
+    <Text Include="example2.txt">
+      <Filter>Data</Filter>
+    </Text>
+    <Text Include="input632.txt">
       <Filter>Data</Filter>
     </Text>
   </ItemGroup>
