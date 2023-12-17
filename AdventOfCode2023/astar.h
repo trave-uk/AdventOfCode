@@ -104,6 +104,14 @@ public:
 	{
 		return first >= min.first && first <= max.first && second >= min.second && second <= max.second;
 	}
+	virtual void move(const coord& dir)
+	{
+		*this += dir;
+	}
+	bool reached(const coord& goal)
+	{
+		return *this == goal;
+	}
 };
 
 // Define ASTARDEBUG to output the entire grid on each iteration. Useful for spotting bad data.
@@ -160,7 +168,7 @@ struct INode
 
 // class tNode must have an "isBlocked" function thus:
 //  bool tNode::isBlocked();
-template<class tNode> int64 aStarSearch(coord& start, coord& goal, std::map<coord, tNode>& space, std::vector<coord>* pPath = nullptr)
+template<class tCoord, class tNode> int64 aStarSearch(tCoord& start, coord& goal, std::map<tCoord, tNode>& space, std::vector<tCoord>* pPath = nullptr)
 {
 #ifdef ASTARDEBUG
 	// Find the maximum extents of space
@@ -173,15 +181,15 @@ template<class tNode> int64 aStarSearch(coord& start, coord& goal, std::map<coor
 			max.second = node.first.second;
 	}
 #endif
-	std::set<coord> openSet;
+	std::set<tCoord> openSet;
 	openSet.insert(start);
-	std::map<coord, int64> gScore;
+	std::map<tCoord, int64> gScore;
 	gScore[start] = 0;
-	std::map<coord, int64> fScore;
-	fScore[start] = coord::heuristic(start, goal);
+	std::map<tCoord, int64> fScore;
+	fScore[start] = tCoord::heuristic(start, goal);
 
 	// For node n, cameFrom[n] is the node immediately preceding it on the cheapest path from start to n currently known.
-	std::map<coord, coord> cameFrom;
+	std::map<tCoord, tCoord> cameFrom;
 
 	while (!openSet.empty())
 	{
@@ -189,8 +197,8 @@ template<class tNode> int64 aStarSearch(coord& start, coord& goal, std::map<coor
 		print(start, goal, space, max, openSet);
 #endif
 		int64 minF = INT_MAX;
-		coord current;
-		for (const coord& c : openSet)
+		tCoord current;
+		for (const tCoord& c : openSet)
 		{
 			if (fScore.count(c) && fScore[c] < minF)
 			{
@@ -199,7 +207,7 @@ template<class tNode> int64 aStarSearch(coord& start, coord& goal, std::map<coor
 			}
 		}
 
-		if (current == goal)
+		if (current.reached(goal))
 		{
 			if (pPath)
 			{
@@ -212,15 +220,15 @@ template<class tNode> int64 aStarSearch(coord& start, coord& goal, std::map<coor
 				}
 				std::reverse(pPath->begin(), pPath->end());
 			}
-			return fScore[goal];
+			return fScore[current];
 		}
 
 		openSet.erase(current);
 		for (int dir = 0; dir < 4; ++dir)
 		{
-			coord neighbour = current;
-			neighbour.first += (dir == 0) - (dir == 1);
-			neighbour.second += (dir == 2) - (dir == 3);
+			tCoord neighbour = current;
+			coord d((dir == 0) - (dir == 1), (dir == 2) - (dir == 3));
+			neighbour.move(d);
 
 			if (!space.count(neighbour) || space[neighbour].isBlocked())
 				continue;
@@ -233,7 +241,7 @@ template<class tNode> int64 aStarSearch(coord& start, coord& goal, std::map<coor
 				// This path to neighbour is better than any previous one. Record it!
 				cameFrom[neighbour] = current;
 				gScore[neighbour] = tentative_gScore;
-				fScore[neighbour] = tentative_gScore + coord::heuristic(neighbour, goal);
+				fScore[neighbour] = tentative_gScore + tCoord::heuristic(neighbour, goal);
 				openSet.insert(neighbour);
 			}
 		}
