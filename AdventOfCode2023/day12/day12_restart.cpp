@@ -18,19 +18,27 @@ bool Matches(std::string pat, int64 number, bool lastNumber)
 		if (!number)
 		{
 			if (c == '#')
+			{
+				cache2[k] = false;
 				return false;
+			}
 			else if (!lastNumber)
+			{
+				cache2[k] = true;
 				return true;
+			}
 		}
 		else
 		{
 			if (c == '.')
+			{
+				cache2[k] = false;
 				return false;
+			}
 			--number;
 		}
 	}
-	bool result = !number && lastNumber;
-
+	bool result = (!number && lastNumber);
 
 	cache2[k] = result;
 	return result;
