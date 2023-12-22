@@ -96,11 +96,11 @@ public:
 		first *= rhs;
 		second *= rhs;
 	}
-	int64 length()
+	int64 length() const
 	{
 		return max(abs(first), abs(second));
 	}
-	bool isContained(const coord& min, const coord& max)
+	bool isContained(const coord& min, const coord& max) const
 	{
 		return first >= min.first && first <= max.first && second >= min.second && second <= max.second;
 	}
@@ -108,7 +108,7 @@ public:
 	{
 		*this += dir;
 	}
-	bool reached(const coord& goal)
+	bool reached(const coord& goal) const
 	{
 		return *this == goal;
 	}
