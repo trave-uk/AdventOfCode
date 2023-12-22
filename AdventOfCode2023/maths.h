@@ -52,3 +52,103 @@ inline int64 gcd(int64 a, int64 b)
 	}
 	return a;
 }
+
+struct coord3 : public std::tuple<int64, int64, int64>
+{
+	coord3(int64 x = 0, int64 y = 0, int64 z = 0)
+	{
+		get<0>() = x;
+		get<1>() = y;
+		get<2>() = z;
+	}
+
+	coord3(char* input)
+	{
+		char* x = strtok(input, ",");
+		get<0>() = atoll(x);
+		char* y = strtok(nullptr, ",");
+		get<1>() = atoll(y);
+		char* z = strtok(nullptr, ",");
+		get<2>() = atoll(z);
+	}
+
+	template <std::size_t I>
+	int64 get() const
+	{
+		return std::get<I>(static_cast<coord3 const&>(*this));
+	}
+
+	template <std::size_t I>
+	int64& get()
+	{
+		return std::get<I>(static_cast<coord3&>(*this));
+	}
+
+	bool operator<(const coord3& other) const
+	{
+		if (get<2>() < other.get<2>())
+			return true;
+		else if (get<2>() > other.get<2>())
+			return false;
+		else if (get<0>() < other.get<0>())
+			return true;
+		else if (get<0>() > other.get<0>())
+			return false;
+		else if (get<1>() < other.get<1>())
+			return true;
+		assert(get<1>() >= other.get<1>());
+		return false;
+	}
+
+	bool operator>(const coord3& other) const
+	{
+		if (get<2>() > other.get<2>())
+			return true;
+		else if (get<2>() < other.get<2>())
+			return false;
+		else if (get<0>() > other.get<0>())
+			return true;
+		else if (get<0>() < other.get<0>())
+			return false;
+		else if (get<1>() > other.get<1>())
+			return true;
+		assert(get<1>() <= other.get<1>());
+		return false;
+	}
+
+	bool operator<=(const coord3& other) const
+	{
+		return *this < other || *this == other;
+	}
+
+	bool operator>=(const coord3& other) const
+	{
+		return *this > other || *this == other;
+	}
+
+	void operator-=(const coord3& other)
+	{
+		get<0>() -= other.get<0>();
+		get<1>() -= other.get<1>();
+		get<2>() -= other.get<2>();
+	}
+
+	void operator+=(const coord3& other)
+	{
+		get<0>() += other.get<0>();
+		get<1>() += other.get<1>();
+		get<2>() += other.get<2>();
+	}
+
+	void operator/=(int64 d)
+	{
+		get<0>() /= d;
+		get<1>() /= d;
+		get<2>() /= d;
+	}
+
+	int64 Length() const
+	{
+		return max(max(get<0>(), get<1>()), get<2>());
+	}
+};
