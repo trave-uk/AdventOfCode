@@ -63,56 +63,58 @@ function A_Star(start, goal, h)
 
 using int64 = __int64;
 
-class coord : public std::pair<int64, int64>
+template<typename tCoord = int64>
+class coord_type : public std::pair<tCoord, tCoord>
 {
 public:
-	coord(int64 x = 0, int64 y = 0)
+	coord_type<tCoord>(tCoord x = 0, tCoord y = 0)
 	{
-		first = x;
-		second = y;
+		this->first = x;
+		this->second = y;
 	}
 	// default (only) heuristic: Manhattan distance
-	static int64 heuristic(coord& start, coord& goal)
+	static tCoord heuristic(coord_type<tCoord>& start, coord_type<tCoord>& goal)
 	{
 		return (abs(start.first - goal.first) + abs(start.second - goal.second));
 	}
-	void operator+=(const coord& rhs)
+	void operator+=(const coord_type<tCoord>& rhs)
 	{
-		first += rhs.first;
-		second += rhs.second;
+		this->first += rhs.first;
+		this->second += rhs.second;
 	}
-	void operator-=(const coord& rhs)
+	void operator-=(const coord_type<tCoord>& rhs)
 	{
-		first -= rhs.first;
-		second -= rhs.second;
+		this->first -= rhs.first;
+		this->second -= rhs.second;
 	}
-	void operator/=(int64 rhs)
+	void operator/=(tCoord rhs)
 	{
-		first /= rhs;
-		second /= rhs;
+		this->first /= rhs;
+		this->second /= rhs;
 	}
-	void operator*=(int64 rhs)
+	void operator*=(tCoord rhs)
 	{
-		first *= rhs;
-		second *= rhs;
+		this->first *= rhs;
+		this->second *= rhs;
 	}
-	int64 length() const
+	tCoord length() const
 	{
-		return max(abs(first), abs(second));
+		return max(abs(this->first), abs(this->second));
 	}
-	bool isContained(const coord& min, const coord& max) const
+	bool isContained(const coord_type<tCoord>& min, const coord_type<tCoord>& max, tCoord epsilon = 0) const
 	{
-		return first >= min.first && first <= max.first && second >= min.second && second <= max.second;
+		return (this->first + epsilon) >= min.first && (this->first - epsilon) <= max.first && (this->second + epsilon) >= min.second && (this->second - epsilon) <= max.second;
 	}
-	virtual void move(const coord& dir)
+	virtual void move(const coord_type<tCoord>& dir)
 	{
 		*this += dir;
 	}
-	bool reached(const coord& goal) const
+	bool reached(const coord_type<tCoord>& goal) const
 	{
 		return *this == goal;
 	}
 };
+using coord = coord_type<int64>;
 
 // Define ASTARDEBUG to output the entire grid on each iteration. Useful for spotting bad data.
 //#define ASTARDEBUG

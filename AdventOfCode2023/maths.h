@@ -64,11 +64,11 @@ struct coord3 : public std::tuple<int64, int64, int64>
 
 	coord3(char* input)
 	{
-		char* x = strtok(input, ",");
+		char* x = strtok(input, ", ");
 		get<0>() = atoll(x);
-		char* y = strtok(nullptr, ",");
+		char* y = strtok(nullptr, ", ");
 		get<1>() = atoll(y);
-		char* z = strtok(nullptr, ",");
+		char* z = strtok(nullptr, ", ");
 		get<2>() = atoll(z);
 	}
 
