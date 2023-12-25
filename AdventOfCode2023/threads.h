@@ -31,7 +31,7 @@ public:
     }
 
     void pop() {
-        std::lock_guard lock(mutex);
+        std::lock_guard<std::mutex> lock(mutex);
         queue.pop();
     }
 
@@ -42,6 +42,11 @@ public:
         T item = queue.front();
         queue.pop();
         return item;
+    }
+
+    bool empty()
+    {
+        return queue.empty();
     }
 };
 
