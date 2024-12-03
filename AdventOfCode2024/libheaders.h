@@ -21,6 +21,7 @@
 #include <queue>
 #include <deque>
 #include <bitset>
+#include <regex>
 
 #include <windows.h>
 #include <processenv.h>
