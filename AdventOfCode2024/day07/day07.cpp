@@ -4,6 +4,47 @@
 
 #include "stdafx.h"
 
+class Equation
+{
+public:
+	int64 result;
+	std::deque<int64> numbers;
+
+	int64 pop_front()
+	{
+		int64 f = numbers.front();
+		numbers.pop_front();
+		return f;
+	}
+};
+
+int64 append(const int64& l, const int64& r)
+{
+	char join[128];
+	sprintf_s(join, "%lld%lld", l, r);
+	int64 j = _atoi64(join);
+	return j;
+}
+
+int64 TestEquation(const Equation& e, int64 a = 0, int part = 1)
+{
+	if (e.numbers.size() == 0)
+	{
+		if (a == e.result)
+			return a;
+		else
+			return 0;
+	}
+	auto e1 = e;
+	int64 n = e1.pop_front();
+	int64 result = TestEquation(e1, a + n, part);
+	if (!result)
+		result = TestEquation(e1, a * n, part);
+	if (!result && part == 2)
+		result = TestEquation(e1, append(a, n), part);
+	return result;
+}
+
 void Process(const char* filename, int64 expectedPart1 = -1, int64 expectedPart2 = -1)
 {
 	char* buffer = new char[65536];
@@ -19,8 +60,22 @@ void Process(const char* filename, int64 expectedPart1 = -1, int64 expectedPart2
 			if (*thisLine)
 			{
 				int pos = 0;
-				std::string line(thisLine);
-
+				Equation e;
+				char *tok = strtok(thisLine, ":");
+				e.result = _atoi64(tok);
+				tok = strtok(nullptr, " ");
+				while (tok)
+				{
+					e.numbers.push_back(_atoi64(tok));
+					tok = strtok(nullptr, " ");
+				}
+				int64 f = e.pop_front();
+				int64 valid = TestEquation(e, f);
+				if (valid)
+					part1 += valid;
+				else
+					valid = TestEquation(e, f, 2);
+				part2 += valid;
 			}
 		}
 	}
@@ -37,7 +92,7 @@ void Process(const char* filename, int64 expectedPart1 = -1, int64 expectedPart2
 
 int main()
 {
-	Process("example.txt");
+	Process("example.txt", 3749, 11387);
 	Process("input.txt");
 
 	return 0;
