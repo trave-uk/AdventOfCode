@@ -96,6 +96,11 @@ public:
 		first %= rhs.first;
 		second %= rhs.second;
 	}
+	void operator*=(const coord& rhs)
+	{
+		first *= rhs.first;
+		second *= rhs.second;
+	}
 	void operator/=(int64 rhs)
 	{
 		first /= rhs;
