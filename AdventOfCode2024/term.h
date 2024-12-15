@@ -15,6 +15,17 @@ inline void gotoxy(short x, short y)
 	SetConsoleCursorPosition(h, c);
 }
 
+inline void getxy(short& x, short& y)
+{
+	static HANDLE h = NULL;
+	if (!h)
+		h = GetStdHandle(STD_OUTPUT_HANDLE);
+	CONSOLE_SCREEN_BUFFER_INFO info;
+	GetConsoleScreenBufferInfo(h, &info);
+	x = info.dwCursorPosition.X;
+	y = info.dwCursorPosition.Y;
+}
+
 // Colour codes from https://www.codeproject.com/Tips/5255355/How-to-Put-Color-on-Windows-Console
 enum class TermColour
 {
