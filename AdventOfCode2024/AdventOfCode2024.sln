@@ -60,6 +60,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{26A406
 		libheaders.h = libheaders.h
 		maths.h = maths.h
 		md5.h = md5.h
+		string.h = string.h
 		term.h = term.h
 	EndProjectSection
 EndProject
