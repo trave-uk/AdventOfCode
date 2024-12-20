@@ -85,7 +85,7 @@ struct ClawMachine
 			if (modTest.first == 0 && modTest.second == 0 && modDiv.first == modDiv.second)
 			{
 				int64 b = modDiv.first;
-				int cost = 3 * a + b;
+				int64 cost = 3 * a + b;
 				if (cost < minCost)
 					minCost = cost;
 			}

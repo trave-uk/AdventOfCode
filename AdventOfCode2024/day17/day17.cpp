@@ -39,7 +39,8 @@ struct Computer
 	void Run(Output& output)
 	{
 		int64 pc = 0;
-		while (pc < program.size())
+		const int64 programSize = program.size();
+		while (pc < programSize)
 		{
 			Instruction op = static_cast<Instruction>(program[pc++]);
 			int64 operand = program[pc++];

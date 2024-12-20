@@ -45,7 +45,8 @@ void DefragFiles(FileMap& files, FreeMap& free)
 		}
 		int64 pos = free.front();
 		free.pop_front();
-		if (pos < files.size())
+		const int64 filesSize = files.size();
+		if (pos < filesSize)
 			files[pos] = move;
 		else
 			files.push_back(move);

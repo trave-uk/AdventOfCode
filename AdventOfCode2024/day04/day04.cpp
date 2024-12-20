@@ -22,7 +22,7 @@ bool CheckWord(std::string& word, const Wordsearch& grid, const coord& pos, cons
 	return true;
 }
 
-int CountXmas(const Wordsearch& grid)
+int64 CountXmas(const Wordsearch& grid)
 {
 	int64 height = grid.size();
 	int64 width = grid[0].length();
@@ -54,7 +54,7 @@ int CountXmas(const Wordsearch& grid)
 	return count;
 }
 
-int CountCrossMas(const Wordsearch& grid)
+int64 CountCrossMas(const Wordsearch& grid)
 {
 	int64 height = grid.size();
 	int64 width = grid[0].length();

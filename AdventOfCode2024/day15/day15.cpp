@@ -55,7 +55,7 @@ const coord& Direction(const Move& move)
 		return down;
 	default:
 		assert(false);
-		return coord();
+		return left;
 	}
 }
 
@@ -282,7 +282,8 @@ void Process(const char* filename, int64 expectedPart1 = -1, int64 expectedPart2
 				if (line[0] == '#')
 				{
 					// ##@.O..#
-					for (pos.first = 0; pos.first < line.length(); ++pos.first)
+					const int64 lineLength = line.length();
+					for (pos.first = 0; pos.first < lineLength; ++pos.first)
 					{
 						Tile t = Tile(line[pos.first]);
 						if (t == WALL || t == BOX)

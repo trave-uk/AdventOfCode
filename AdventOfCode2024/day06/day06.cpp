@@ -27,8 +27,8 @@ public:
 
 	bool contains(coord pos) const
 	{
-		size_t height = this->size();
-		size_t width = (*this)[0].length();
+		int64 height = this->size();
+		int64 width = (*this)[0].length();
 		return pos.first >= 0 && pos.first < width && pos.second >= 0 && pos.second < height;
 	}
 };
@@ -84,8 +84,8 @@ int64 scanPart1(const Map& m, const Guard& g)
 int64 scanPart2(const Map& map, const Guard& guard)
 {
 	int64 count = 0;
-	size_t height = map.size();
-	size_t width = map[0].length();
+	int64 height = map.size();
+	int64 width = map[0].length();
 	coord pos;
 	for (pos.first = 0; pos.first < width; ++pos.first)
 	{

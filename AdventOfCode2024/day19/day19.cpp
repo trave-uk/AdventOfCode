@@ -41,7 +41,8 @@ struct Design
 	{
 		if (towel.colours.size() > colours.size() - offset)
 			return false;
-		for (int64 i = 0; i < towel.colours.size(); ++i)
+		const int64 towelColoursSize = towel.colours.size();
+		for (int64 i = 0; i < towelColoursSize; ++i)
 		{
 			if (towel.colours[i] != colours[offset+i])
 				return false;

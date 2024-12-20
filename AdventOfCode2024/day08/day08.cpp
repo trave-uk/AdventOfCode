@@ -86,7 +86,7 @@ void Process(const char* filename, int64 expectedPart1 = -1, int64 expectedPart2
 					antinodes.insert(antinode);
 				}
 				// for part 2, +-width should be big enough as a multiplier
-				for (int k = -width; k < width; ++k)
+				for (int64 k = -width; k < width; ++k)
 				{
 					coord offset = dir;
 					offset *= k;
