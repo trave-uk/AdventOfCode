@@ -22,6 +22,7 @@
 #include <deque>
 #include <bitset>
 #include <regex>
+#include <format>
 
 #include <windows.h>
 #include <processenv.h>

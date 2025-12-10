@@ -4,6 +4,35 @@
 
 #include "stdafx.h"
 
+int64 CalculateJoltage(const std::string& line, int digits)
+{
+	int64 joltage = 0;
+	int64 prevIndex = -1;
+	for (int digit = 1; digit <= digits; ++digit)
+	{
+		auto line1 = line.substr(0, line.length() + digit - digits);
+		int64 index = 0;
+		int64 thisMax = 0;
+		int64 thisIndex = 0;
+		for (char c : line1)
+		{
+			if (index > prevIndex)
+			{
+				if (c > thisMax)
+				{
+					thisMax = c;
+					thisIndex = index;
+				}
+			}
+			++index;
+		}
+		joltage *= 10;
+		joltage += thisMax - '0';
+		prevIndex = thisIndex;
+	}
+	return joltage;
+}
+
 void Process(const char* filename, int64 expectedPart1 = -1, int64 expectedPart2 = -1)
 {
 	char* buffer = new char[65536];
@@ -20,7 +49,8 @@ void Process(const char* filename, int64 expectedPart1 = -1, int64 expectedPart2
 			{
 				int pos = 0;
 				std::string line(thisLine);
-
+				part1 += CalculateJoltage(line, 2);
+				part2 += CalculateJoltage(line, 12);
 			}
 		}
 	}
@@ -36,7 +66,7 @@ void Process(const char* filename, int64 expectedPart1 = -1, int64 expectedPart2
 
 int main()
 {
-	Process("example.txt");
+	Process("example.txt", 357, 3121910778619);
 	Process("input.txt");
 
 	return 0;
